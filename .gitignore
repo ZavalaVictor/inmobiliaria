@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+
+# IDEs and editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# Laravel / PHP
+backend/vendor/
+backend/storage/*.key
+backend/storage/pail/
+backend/public/build/
+backend/public/hot
+backend/public/storage
+backend/.phpunit.result.cache
+backend/.phpunit.cache/
+backend/auth.json
+backend/database/*.sqlite
+
+# Node / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/*.local
+
+# Temporary project caches
+.cache/
+*.log
