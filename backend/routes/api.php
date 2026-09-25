@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\CategoriaController;
 use App\Http\Controllers\Api\V1\ClienteController;
 use App\Http\Controllers\Api\V1\InmuebleController;
+use App\Http\Controllers\Api\V1\InmuebleImagenController;
 use App\Http\Controllers\Api\V1\PropietarioController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,5 +35,14 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('categorias', CategoriaController::class);
         Route::apiResource('inmuebles', InmuebleController::class);
         Route::apiResource('propietarios', PropietarioController::class);
+
+        Route::scopeBindings()->group(function (): void {
+            Route::get('inmuebles/{inmueble}/imagenes', [InmuebleImagenController::class, 'index']);
+            Route::post('inmuebles/{inmueble}/imagenes', [InmuebleImagenController::class, 'store']);
+            Route::patch('inmuebles/{inmueble}/imagenes/reordenar', [InmuebleImagenController::class, 'reorder']);
+            Route::patch('inmuebles/{inmueble}/imagenes/{imagen}/principal', [InmuebleImagenController::class, 'principal']);
+            Route::patch('inmuebles/{inmueble}/imagenes/{imagen}', [InmuebleImagenController::class, 'update']);
+            Route::delete('inmuebles/{inmueble}/imagenes/{imagen}', [InmuebleImagenController::class, 'destroy']);
+        });
     });
 });

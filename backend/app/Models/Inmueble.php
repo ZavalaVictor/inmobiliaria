@@ -84,6 +84,13 @@ class Inmueble extends Model
         return $this->hasMany(InmuebleImagen::class, 'inmueble_id');
     }
 
+    protected function childRouteBindingRelationshipName($childType): string
+    {
+        return $childType === 'imagen'
+            ? 'imagenes'
+            : parent::childRouteBindingRelationshipName($childType);
+    }
+
     public function interesesClientes(): HasMany
     {
         return $this->hasMany(ClienteInmuebleInteres::class, 'inmueble_id');

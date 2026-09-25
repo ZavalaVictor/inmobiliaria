@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Contracts\InmuebleImageStorage;
+use App\Services\FirebaseInmuebleImageStorage;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -16,7 +18,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(InmuebleImageStorage::class, function (): InmuebleImageStorage {
+            return app(FirebaseInmuebleImageStorage::class);
+        });
     }
 
     /**
