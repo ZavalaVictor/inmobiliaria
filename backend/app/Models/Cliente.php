@@ -85,6 +85,23 @@ class Cliente extends Model
         return $this->hasMany(Documento::class, 'cliente_id');
     }
 
+    protected function childRouteBindingRelationshipName($childType): string
+    {
+        return match ($childType) {
+            'asignacion' => 'asignacionesAgentes',
+            default => parent::childRouteBindingRelationshipName($childType),
+        };
+    }
+
+    protected function resolveChildRouteBindingQuery($childType, $value, $field)
+    {
+        $query = parent::resolveChildRouteBindingQuery($childType, $value, $field);
+
+        return $childType === 'asignacion'
+            ? $query->whereHas('agente')
+            : $query;
+    }
+
     public function historialCorreos(): HasMany
     {
         return $this->hasMany(HistorialCorreo::class, 'cliente_id');

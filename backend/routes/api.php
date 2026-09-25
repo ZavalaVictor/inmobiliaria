@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AgenteController;
 use App\Http\Controllers\Api\V1\AgenteInmuebleController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\CategoriaController;
+use App\Http\Controllers\Api\V1\ClienteAgenteController;
 use App\Http\Controllers\Api\V1\ClienteController;
 use App\Http\Controllers\Api\V1\InmuebleController;
 use App\Http\Controllers\Api\V1\InmuebleImagenController;
@@ -43,6 +44,11 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('users', UserController::class);
 
         Route::scopeBindings()->group(function (): void {
+            Route::get('clientes/{cliente}/agentes', [ClienteAgenteController::class, 'index']);
+            Route::post('clientes/{cliente}/agentes', [ClienteAgenteController::class, 'store']);
+            Route::patch('clientes/{cliente}/agentes/{asignacion}/principal', [ClienteAgenteController::class, 'principal']);
+            Route::delete('clientes/{cliente}/agentes/{asignacion}', [ClienteAgenteController::class, 'destroy']);
+
             Route::get('inmuebles/{inmueble}/agentes', [AgenteInmuebleController::class, 'index']);
             Route::post('inmuebles/{inmueble}/agentes', [AgenteInmuebleController::class, 'store']);
             Route::patch('inmuebles/{inmueble}/agentes/{asignacion}/principal', [AgenteInmuebleController::class, 'principal']);
