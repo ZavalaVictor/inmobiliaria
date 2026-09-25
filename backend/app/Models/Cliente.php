@@ -89,6 +89,7 @@ class Cliente extends Model
     {
         return match ($childType) {
             'asignacion' => 'asignacionesAgentes',
+            'interes' => 'interesesInmuebles',
             default => parent::childRouteBindingRelationshipName($childType),
         };
     }
@@ -97,9 +98,11 @@ class Cliente extends Model
     {
         $query = parent::resolveChildRouteBindingQuery($childType, $value, $field);
 
-        return $childType === 'asignacion'
-            ? $query->whereHas('agente')
-            : $query;
+        return match ($childType) {
+            'asignacion' => $query->whereHas('agente'),
+            'interes' => $query->whereHas('inmueble'),
+            default => $query,
+        };
     }
 
     public function historialCorreos(): HasMany
