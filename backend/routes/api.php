@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\ClienteController;
 use App\Http\Controllers\Api\V1\ClienteInmuebleInteresController;
 use App\Http\Controllers\Api\V1\InmuebleController;
 use App\Http\Controllers\Api\V1\InmuebleImagenController;
+use App\Http\Controllers\Api\V1\InteraccionClienteController;
 use App\Http\Controllers\Api\V1\PropietarioController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,12 @@ Route::prefix('v1')->group(function (): void {
             Route::get('clientes/{cliente}/intereses/{interes}', [ClienteInmuebleInteresController::class, 'show']);
             Route::patch('clientes/{cliente}/intereses/{interes}', [ClienteInmuebleInteresController::class, 'update']);
             Route::delete('clientes/{cliente}/intereses/{interes}', [ClienteInmuebleInteresController::class, 'destroy']);
+
+            Route::get('clientes/{cliente}/interacciones', [InteraccionClienteController::class, 'index']);
+            Route::post('clientes/{cliente}/interacciones', [InteraccionClienteController::class, 'store']);
+            Route::get('clientes/{cliente}/interacciones/{interaccion}', [InteraccionClienteController::class, 'show']);
+            Route::patch('clientes/{cliente}/interacciones/{interaccion}', [InteraccionClienteController::class, 'update']);
+            Route::delete('clientes/{cliente}/interacciones/{interaccion}', [InteraccionClienteController::class, 'destroy']);
 
             Route::get('clientes/{cliente}/agentes', [ClienteAgenteController::class, 'index']);
             Route::post('clientes/{cliente}/agentes', [ClienteAgenteController::class, 'store']);
