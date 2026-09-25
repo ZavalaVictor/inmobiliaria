@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AgenteController;
+use App\Http\Controllers\Api\V1\AgenteInmuebleController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\CategoriaController;
 use App\Http\Controllers\Api\V1\ClienteController;
@@ -42,6 +43,11 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('users', UserController::class);
 
         Route::scopeBindings()->group(function (): void {
+            Route::get('inmuebles/{inmueble}/agentes', [AgenteInmuebleController::class, 'index']);
+            Route::post('inmuebles/{inmueble}/agentes', [AgenteInmuebleController::class, 'store']);
+            Route::patch('inmuebles/{inmueble}/agentes/{asignacion}/principal', [AgenteInmuebleController::class, 'principal']);
+            Route::delete('inmuebles/{inmueble}/agentes/{asignacion}', [AgenteInmuebleController::class, 'destroy']);
+
             Route::get('inmuebles/{inmueble}/imagenes', [InmuebleImagenController::class, 'index']);
             Route::post('inmuebles/{inmueble}/imagenes', [InmuebleImagenController::class, 'store']);
             Route::patch('inmuebles/{inmueble}/imagenes/reordenar', [InmuebleImagenController::class, 'reorder']);
