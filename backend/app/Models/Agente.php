@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoLaboralAgente;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -29,6 +30,7 @@ class Agente extends Model
     protected function casts(): array
     {
         return [
+            'estado_laboral' => EstadoLaboralAgente::class,
             'porcentaje_comision' => 'decimal:2',
             'fecha_contratacion' => 'date',
         ];

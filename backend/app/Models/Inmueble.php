@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoDisponibilidadInmueble;
+use App\Enums\TipoOperacion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -49,6 +51,8 @@ class Inmueble extends Model
     protected function casts(): array
     {
         return [
+            'tipo_operacion' => TipoOperacion::class,
+            'estado_disponibilidad' => EstadoDisponibilidadInmueble::class,
             'precio_venta' => 'decimal:2',
             'renta_mensual' => 'decimal:2',
             'superficie_terreno_m2' => 'decimal:2',

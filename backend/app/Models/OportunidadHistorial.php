@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoOportunidad;
+use App\Enums\EtapaOportunidad;
+use App\Enums\TipoEventoOportunidad;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -28,6 +31,11 @@ class OportunidadHistorial extends Model
     protected function casts(): array
     {
         return [
+            'tipo_evento' => TipoEventoOportunidad::class,
+            'etapa_anterior' => EtapaOportunidad::class,
+            'etapa_nueva' => EtapaOportunidad::class,
+            'estado_anterior' => EstadoOportunidad::class,
+            'estado_nuevo' => EstadoOportunidad::class,
             'fecha_cambio' => 'datetime',
         ];
     }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoOportunidad;
+use App\Enums\EtapaOportunidad;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -31,6 +33,8 @@ class Oportunidad extends Model
     protected function casts(): array
     {
         return [
+            'etapa' => EtapaOportunidad::class,
+            'estado' => EstadoOportunidad::class,
             'fecha_apertura' => 'datetime',
             'fecha_cierre' => 'datetime',
         ];

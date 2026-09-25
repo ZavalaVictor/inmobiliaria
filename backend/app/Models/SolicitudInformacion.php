@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoSolicitudInformacion;
+use App\Enums\MedioSolicitudInformacion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -31,6 +33,8 @@ class SolicitudInformacion extends Model
     protected function casts(): array
     {
         return [
+            'medio_preferido' => MedioSolicitudInformacion::class,
+            'estado' => EstadoSolicitudInformacion::class,
             'fecha_solicitud' => 'datetime',
             'fecha_atencion' => 'datetime',
         ];

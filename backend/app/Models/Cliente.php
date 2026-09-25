@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoCliente;
+use App\Enums\TipoInteresCliente;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -31,6 +33,8 @@ class Cliente extends Model
     protected function casts(): array
     {
         return [
+            'tipo_interes' => TipoInteresCliente::class,
+            'estado_cliente' => EstadoCliente::class,
             'presupuesto_min' => 'decimal:2',
             'presupuesto_max' => 'decimal:2',
         ];
