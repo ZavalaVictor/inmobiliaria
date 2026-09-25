@@ -42,3 +42,4 @@ frontend/*.local
 # Temporary project caches
 .cache/
 *.log
+/backend/.env.testing
