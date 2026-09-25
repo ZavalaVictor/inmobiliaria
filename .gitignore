@@ -25,6 +25,7 @@ backend/public/storage
 backend/.phpunit.result.cache
 backend/.phpunit.cache/
 backend/auth.json
+backend/.composer-cache/
 backend/database/*.sqlite
 
 # Node / Vite
