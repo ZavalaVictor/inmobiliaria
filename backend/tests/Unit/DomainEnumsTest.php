@@ -30,9 +30,9 @@ use App\Enums\TipoOperacion;
 use App\Enums\TipoPersonaPropietario;
 use App\Enums\TipoRespaldo;
 use App\Models\Inmueble;
+use App\Models\Operacion;
 use App\Models\Oportunidad;
 use App\Models\OportunidadHistorial;
-use App\Models\Operacion;
 use PHPUnit\Framework\TestCase;
 
 final class DomainEnumsTest extends TestCase
