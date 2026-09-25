@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\CategoriaController;
 use App\Http\Controllers\Api\V1\ClienteAgenteController;
 use App\Http\Controllers\Api\V1\ClienteController;
+use App\Http\Controllers\Api\V1\ClienteInmuebleInteresController;
 use App\Http\Controllers\Api\V1\InmuebleController;
 use App\Http\Controllers\Api\V1\InmuebleImagenController;
 use App\Http\Controllers\Api\V1\PropietarioController;
@@ -44,6 +45,12 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('users', UserController::class);
 
         Route::scopeBindings()->group(function (): void {
+            Route::get('clientes/{cliente}/intereses', [ClienteInmuebleInteresController::class, 'index']);
+            Route::post('clientes/{cliente}/intereses', [ClienteInmuebleInteresController::class, 'store']);
+            Route::get('clientes/{cliente}/intereses/{interes}', [ClienteInmuebleInteresController::class, 'show']);
+            Route::patch('clientes/{cliente}/intereses/{interes}', [ClienteInmuebleInteresController::class, 'update']);
+            Route::delete('clientes/{cliente}/intereses/{interes}', [ClienteInmuebleInteresController::class, 'destroy']);
+
             Route::get('clientes/{cliente}/agentes', [ClienteAgenteController::class, 'index']);
             Route::post('clientes/{cliente}/agentes', [ClienteAgenteController::class, 'store']);
             Route::patch('clientes/{cliente}/agentes/{asignacion}/principal', [ClienteAgenteController::class, 'principal']);
