@@ -86,9 +86,20 @@ class Inmueble extends Model
 
     protected function childRouteBindingRelationshipName($childType): string
     {
-        return $childType === 'imagen'
-            ? 'imagenes'
-            : parent::childRouteBindingRelationshipName($childType);
+        return match ($childType) {
+            'imagen' => 'imagenes',
+            'asignacion' => 'asignacionesAgentes',
+            default => parent::childRouteBindingRelationshipName($childType),
+        };
+    }
+
+    protected function resolveChildRouteBindingQuery($childType, $value, $field)
+    {
+        $query = parent::resolveChildRouteBindingQuery($childType, $value, $field);
+
+        return $childType === 'asignacion'
+            ? $query->whereHas('agente')
+            : $query;
     }
 
     public function interesesClientes(): HasMany
