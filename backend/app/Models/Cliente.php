@@ -90,6 +90,7 @@ class Cliente extends Model
         return match ($childType) {
             'asignacion' => 'asignacionesAgentes',
             'interes' => 'interesesInmuebles',
+            'interaccion' => 'interacciones',
             default => parent::childRouteBindingRelationshipName($childType),
         };
     }
@@ -101,6 +102,7 @@ class Cliente extends Model
         return match ($childType) {
             'asignacion' => $query->whereHas('agente'),
             'interes' => $query->whereHas('inmueble'),
+            'interaccion' => $query,
             default => $query,
         };
     }
