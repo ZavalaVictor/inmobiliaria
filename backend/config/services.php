@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        'images_bucket' => env('FIREBASE_IMAGES_BUCKET'),
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+        'images_public_url_base' => env('FIREBASE_IMAGES_PUBLIC_URL_BASE'),
+        'inmueble_image_max_kb' => (int) env('INMUEBLE_IMAGE_MAX_KB', 10240),
+    ],
+
 ];

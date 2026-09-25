@@ -55,6 +55,7 @@ class InmuebleResource extends JsonResource
                     'nombre' => $this->categoria->nombre,
                 ];
             }),
+            'imagenes' => InmuebleImagenResource::collection($this->whenLoaded('imagenes')),
         ];
 
         if ($request->user()?->can('propietarios.ver')) {
