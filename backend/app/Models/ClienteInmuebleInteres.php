@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoInteresInmueble;
+use App\Enums\NivelInteres;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,6 +26,8 @@ class ClienteInmuebleInteres extends Model
     protected function casts(): array
     {
         return [
+            'nivel_interes' => NivelInteres::class,
+            'estado' => EstadoInteresInmueble::class,
             'fecha_interes' => 'datetime',
         ];
     }

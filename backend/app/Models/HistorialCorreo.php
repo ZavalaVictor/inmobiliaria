@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoCorreo;
+use App\Enums\TipoCorreo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -28,6 +30,8 @@ class HistorialCorreo extends Model
     protected function casts(): array
     {
         return [
+            'tipo' => TipoCorreo::class,
+            'estado' => EstadoCorreo::class,
             'fecha_envio' => 'datetime',
         ];
     }

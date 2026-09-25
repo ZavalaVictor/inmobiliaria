@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MimeTypeDocumento;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,6 +32,7 @@ class Documento extends Model
     protected function casts(): array
     {
         return [
+            'mime_type' => MimeTypeDocumento::class,
             'fecha_documento' => 'date',
             'fecha_vencimiento' => 'date',
         ];

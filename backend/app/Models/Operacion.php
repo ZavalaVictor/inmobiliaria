@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoOperacion;
+use App\Enums\TipoOperacion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -28,6 +30,8 @@ class Operacion extends Model
     protected function casts(): array
     {
         return [
+            'tipo_operacion' => TipoOperacion::class,
+            'estado' => EstadoOperacion::class,
             'monto' => 'decimal:2',
             'fecha_operacion' => 'datetime',
             'fecha_inicio_contrato' => 'date',

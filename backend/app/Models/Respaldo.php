@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoRespaldo;
+use App\Enums\EstadoRestauracionRespaldo;
+use App\Enums\TipoRespaldo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -28,6 +31,9 @@ class Respaldo extends Model
     protected function casts(): array
     {
         return [
+            'tipo' => TipoRespaldo::class,
+            'estado' => EstadoRespaldo::class,
+            'estado_restauracion' => EstadoRestauracionRespaldo::class,
             'fecha_inicio' => 'datetime',
             'fecha_finalizacion' => 'datetime',
             'restaurado_at' => 'datetime',

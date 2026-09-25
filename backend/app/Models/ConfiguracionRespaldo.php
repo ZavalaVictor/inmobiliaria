@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\FrecuenciaRespaldo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -25,6 +26,7 @@ class ConfiguracionRespaldo extends Model
     {
         return [
             'activo' => 'boolean',
+            'frecuencia' => FrecuenciaRespaldo::class,
             'dia_semana' => 'integer',
             'dia_mes' => 'integer',
             'retencion_dias' => 'integer',

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoUsuario;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,6 +34,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'estado' => EstadoUsuario::class,
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'password' => 'hashed',

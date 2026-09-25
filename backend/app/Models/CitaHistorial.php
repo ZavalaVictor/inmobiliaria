@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TipoCambioCita;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -30,6 +31,7 @@ class CitaHistorial extends Model
     protected function casts(): array
     {
         return [
+            'tipo_cambio' => TipoCambioCita::class,
             'fecha_inicio_anterior' => 'datetime',
             'fecha_fin_anterior' => 'datetime',
             'fecha_inicio_nueva' => 'datetime',

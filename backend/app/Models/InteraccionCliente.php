@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TipoInteraccionCliente;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -26,6 +27,7 @@ class InteraccionCliente extends Model
     protected function casts(): array
     {
         return [
+            'tipo' => TipoInteraccionCliente::class,
             'fecha_interaccion' => 'datetime',
             'fecha_proxima_accion' => 'datetime',
         ];

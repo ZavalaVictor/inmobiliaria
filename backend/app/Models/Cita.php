@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoCita;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -29,6 +30,7 @@ class Cita extends Model
     protected function casts(): array
     {
         return [
+            'estado' => EstadoCita::class,
             'fecha_inicio' => 'datetime',
             'fecha_fin' => 'datetime',
         ];
