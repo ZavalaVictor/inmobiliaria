@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\CategoriaController;
 use App\Http\Controllers\Api\V1\ClienteController;
 use App\Http\Controllers\Api\V1\PropietarioController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,7 @@ Route::prefix('v1')->group(function (): void {
 
     Route::middleware(['auth:sanctum', 'account.active'])->group(function (): void {
         Route::apiResource('clientes', ClienteController::class);
+        Route::apiResource('categorias', CategoriaController::class);
         Route::apiResource('propietarios', PropietarioController::class);
     });
 });
