@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\ClienteController;
 use App\Http\Controllers\Api\V1\InmuebleController;
 use App\Http\Controllers\Api\V1\InmuebleImagenController;
 use App\Http\Controllers\Api\V1\PropietarioController;
+use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
@@ -37,6 +38,8 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('categorias', CategoriaController::class);
         Route::apiResource('inmuebles', InmuebleController::class);
         Route::apiResource('propietarios', PropietarioController::class);
+        Route::put('users/{user}/roles', [UserController::class, 'updateRoles']);
+        Route::apiResource('users', UserController::class);
 
         Route::scopeBindings()->group(function (): void {
             Route::get('inmuebles/{inmueble}/imagenes', [InmuebleImagenController::class, 'index']);
