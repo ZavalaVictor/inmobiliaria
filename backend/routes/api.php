@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\ClienteInmuebleInteresController;
 use App\Http\Controllers\Api\V1\InmuebleController;
 use App\Http\Controllers\Api\V1\InmuebleImagenController;
 use App\Http\Controllers\Api\V1\InteraccionClienteController;
+use App\Http\Controllers\Api\V1\OperacionController;
 use App\Http\Controllers\Api\V1\OportunidadController;
 use App\Http\Controllers\Api\V1\OportunidadHistorialController;
 use App\Http\Controllers\Api\V1\PropietarioController;
@@ -59,6 +60,11 @@ Route::prefix('v1')->group(function (): void {
         Route::get('citas/{cita}', [CitaController::class, 'show']);
         Route::patch('citas/{cita}', [CitaController::class, 'update']);
         Route::delete('citas/{cita}', [CitaController::class, 'destroy']);
+        Route::get('operaciones', [OperacionController::class, 'index']);
+        Route::post('operaciones', [OperacionController::class, 'store']);
+        Route::get('operaciones/{operacion}', [OperacionController::class, 'show']);
+        Route::patch('operaciones/{operacion}', [OperacionController::class, 'update']);
+        Route::delete('operaciones/{operacion}', [OperacionController::class, 'destroy']);
         Route::patch('oportunidades/{oportunidad}/etapa', [OportunidadController::class, 'etapa']);
         Route::patch('oportunidades/{oportunidad}/estado', [OportunidadController::class, 'estado']);
         Route::get('oportunidades/{oportunidad}/historial', [OportunidadHistorialController::class, 'index']);
@@ -76,6 +82,11 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('users', UserController::class);
 
         Route::scopeBindings()->group(function (): void {
+            Route::get('operaciones/{operacion}/agentes', [OperacionController::class, 'agents']);
+            Route::post('operaciones/{operacion}/agentes', [OperacionController::class, 'storeAgent']);
+            Route::patch('operaciones/{operacion}/agentes/{asignacion}/principal', [OperacionController::class, 'principal']);
+            Route::delete('operaciones/{operacion}/agentes/{asignacion}', [OperacionController::class, 'destroyAgent']);
+
             Route::get('clientes/{cliente}/intereses', [ClienteInmuebleInteresController::class, 'index']);
             Route::post('clientes/{cliente}/intereses', [ClienteInmuebleInteresController::class, 'store']);
             Route::get('clientes/{cliente}/intereses/{interes}', [ClienteInmuebleInteresController::class, 'show']);
