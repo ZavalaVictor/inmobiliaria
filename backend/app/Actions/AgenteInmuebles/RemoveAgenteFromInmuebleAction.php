@@ -4,14 +4,18 @@ namespace App\Actions\AgenteInmuebles;
 
 use App\Models\AgenteInmueble;
 use App\Models\Inmueble;
+use App\Models\User;
+use App\Services\BitacoraService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 final class RemoveAgenteFromInmuebleAction
 {
-    public function execute(Inmueble $inmueble, AgenteInmueble $assignment): void
+    public function __construct(private readonly BitacoraService $bitacora) {}
+
+    public function execute(Inmueble $inmueble, AgenteInmueble $assignment, ?User $actor = null): void
     {
-        DB::transaction(function () use ($inmueble, $assignment): void {
+        DB::transaction(function () use ($inmueble, $assignment, $actor): void {
             $lockedInmueble = Inmueble::query()
                 ->whereKey($inmueble->getKey())
                 ->lockForUpdate()
@@ -29,6 +33,7 @@ final class RemoveAgenteFromInmuebleAction
             }
 
             $wasPrincipal = (bool) $target->es_principal;
+            $snapshot = ['agente_id' => $target->agente_id, 'inmueble_id' => $target->inmueble_id, 'es_principal' => $target->es_principal];
             $target->delete();
 
             $remaining = AgenteInmueble::query()
@@ -37,6 +42,8 @@ final class RemoveAgenteFromInmuebleAction
             $remainingCount = (clone $remaining)->count();
 
             if ($remainingCount === 0) {
+                $this->bitacora->record($actor, 'agente_inmueble_desasignado', 'agente_inmueble', $assignment->getKey(), 'Agente desasignado de Inmueble.', $snapshot);
+
                 return;
             }
 
@@ -45,6 +52,8 @@ final class RemoveAgenteFromInmuebleAction
                 ->count();
 
             if (! $wasPrincipal && $principalCount === 1) {
+                $this->bitacora->record($actor, 'agente_inmueble_desasignado', 'agente_inmueble', $assignment->getKey(), 'Agente desasignado de Inmueble.', $snapshot);
+
                 return;
             }
 
@@ -62,6 +71,8 @@ final class RemoveAgenteFromInmuebleAction
                     ->whereKey($next->getKey())
                     ->update(['es_principal' => true]);
             }
+
+            $this->bitacora->record($actor, 'agente_inmueble_desasignado', 'agente_inmueble', $assignment->getKey(), 'Agente desasignado; se promovió otro principal.', $snapshot, $next === null ? null : ['agente_id' => $next->agente_id, 'inmueble_id' => $next->inmueble_id, 'es_principal' => true]);
         });
     }
 }

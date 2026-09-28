@@ -5,17 +5,21 @@ namespace App\Actions\AgenteInmuebles;
 use App\Models\Agente;
 use App\Models\AgenteInmueble;
 use App\Models\Inmueble;
+use App\Models\User;
+use App\Services\BitacoraService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class AssignAgenteToInmuebleAction
 {
+    public function __construct(private readonly BitacoraService $bitacora) {}
+
     /**
      * @param  array<string, mixed>  $attributes
      */
-    public function execute(Inmueble $inmueble, array $attributes): AgenteInmueble
+    public function execute(Inmueble $inmueble, array $attributes, ?User $actor = null): AgenteInmueble
     {
-        return DB::transaction(function () use ($inmueble, $attributes): AgenteInmueble {
+        return DB::transaction(function () use ($inmueble, $attributes, $actor): AgenteInmueble {
             $lockedInmueble = Inmueble::query()
                 ->whereKey($inmueble->getKey())
                 ->lockForUpdate()
@@ -63,6 +67,16 @@ final class AssignAgenteToInmuebleAction
                 'inmueble_id' => $lockedInmueble->getKey(),
                 'es_principal' => $isPrincipal,
             ]);
+
+            $this->bitacora->record(
+                $actor,
+                'agente_inmueble_asignado',
+                'agente_inmueble',
+                $assignment->getKey(),
+                $isPrincipal ? 'Agente asignado como principal a Inmueble.' : 'Agente asignado a Inmueble.',
+                null,
+                ['agente_id' => $assignment->agente_id, 'inmueble_id' => $assignment->inmueble_id, 'es_principal' => $assignment->es_principal],
+            );
 
             return $assignment->fresh([
                 'agente:id,user_id,numero_empleado',

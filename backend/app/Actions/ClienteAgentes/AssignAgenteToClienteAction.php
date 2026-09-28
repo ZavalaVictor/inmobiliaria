@@ -5,17 +5,21 @@ namespace App\Actions\ClienteAgentes;
 use App\Models\Agente;
 use App\Models\Cliente;
 use App\Models\ClienteAgente;
+use App\Models\User;
+use App\Services\BitacoraService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class AssignAgenteToClienteAction
 {
+    public function __construct(private readonly BitacoraService $bitacora) {}
+
     /**
      * @param  array<string, mixed>  $attributes
      */
-    public function execute(Cliente $cliente, array $attributes): ClienteAgente
+    public function execute(Cliente $cliente, array $attributes, ?User $actor = null): ClienteAgente
     {
-        return DB::transaction(function () use ($cliente, $attributes): ClienteAgente {
+        return DB::transaction(function () use ($cliente, $attributes, $actor): ClienteAgente {
             $lockedCliente = Cliente::query()
                 ->whereKey($cliente->getKey())
                 ->lockForUpdate()
@@ -63,6 +67,8 @@ final class AssignAgenteToClienteAction
                 'cliente_id' => $lockedCliente->getKey(),
                 'es_principal' => $isPrincipal,
             ]);
+
+            $this->bitacora->record($actor, 'cliente_agente_asignado', 'cliente_agente', $assignment->getKey(), $isPrincipal ? 'Agente asignado como principal a Cliente.' : 'Agente asignado a Cliente.', null, ['cliente_id' => $assignment->cliente_id, 'agente_id' => $assignment->agente_id, 'es_principal' => $assignment->es_principal]);
 
             return $assignment->fresh([
                 'agente:id,user_id,numero_empleado',

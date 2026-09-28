@@ -17,11 +17,13 @@ use App\Models\OperacionAgente;
 use App\Models\Oportunidad;
 use App\Models\Propietario;
 use App\Models\User;
+use App\Services\BitacoraService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Testing\TestResponse;
+use RuntimeException;
 use Tests\Fakes\FakeDocumentoPrivateStorage;
 use Tests\TestCase;
 use Throwable;
@@ -202,6 +204,12 @@ class DocumentosTest extends TestCase
         $response = $this->upload($admin, $category, ['inmueble_id' => $property->id], 'privado.pdf')
             ->assertCreated();
         $document = Documento::query()->findOrFail($response->json('data.id'));
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'documento_creado',
+            'entidad' => 'documento',
+            'entidad_id' => $document->id,
+            'user_id' => $admin->id,
+        ]);
 
         $this->apiGet('/api/v1/documentos/'.$document->id.'/descargar', $admin)
             ->assertOk()
@@ -215,6 +223,12 @@ class DocumentosTest extends TestCase
             'fecha_vencimiento' => '2026-12-31',
             'observaciones' => 'Actualizado',
         ])->assertOk()->assertJsonPath('data.observaciones', 'Actualizado');
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'documento_actualizado',
+            'entidad' => 'documento',
+            'entidad_id' => $document->id,
+            'user_id' => $admin->id,
+        ]);
 
         $this->apiPatch('/api/v1/documentos/'.$document->id, $admin, [
             'fecha_vencimiento' => '2025-01-01',
@@ -230,12 +244,48 @@ class DocumentosTest extends TestCase
         $this->apiDelete('/api/v1/documentos/'.$document->id, $admin)->assertNoContent();
         self::assertSoftDeleted('documentos', ['id' => $document->id]);
         self::assertContains($path, $this->storage->deletes);
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'documento_eliminado',
+            'entidad' => 'documento',
+            'entidad_id' => $document->id,
+            'user_id' => $admin->id,
+        ]);
         $this->apiGet('/api/v1/documentos/'.$document->id, $admin)->assertNotFound();
 
         $second = $this->createDocument($admin, ['inmueble_id' => $property->id]);
         $this->storage->failDelete = true;
         $this->apiDelete('/api/v1/documentos/'.$second->id, $admin)->assertNoContent();
         self::assertSoftDeleted('documentos', ['id' => $second->id]);
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'documento_eliminado',
+            'entidad' => 'documento',
+            'entidad_id' => $second->id,
+            'user_id' => $admin->id,
+        ]);
+    }
+
+    public function test_bitacora_failure_compensates_document_upload_and_rolls_back_metadata(): void
+    {
+        $admin = $this->user('document-bitacora-failure@example.test', 'Administrador');
+        $category = $this->category('Bitácora falla');
+        $property = $this->property('bitacora-failure');
+        $this->app->instance(BitacoraService::class, \Mockery::mock(BitacoraService::class, function ($mock): void {
+            $mock->shouldReceive('record')->once()->andThrow(new RuntimeException('audit unavailable'));
+        }));
+
+        try {
+            app(CreateDocumentoAction::class)->execute($admin, $this->pdf(), [
+                'categoria_documento_id' => $category->id,
+                'inmueble_id' => $property->id,
+            ]);
+            self::fail('La creación debía fallar cuando Bitácora no está disponible.');
+        } catch (RuntimeException $exception) {
+            self::assertSame('audit unavailable', $exception->getMessage());
+        }
+
+        self::assertCount(0, $this->storage->objects);
+        self::assertDatabaseCount('documentos', 0);
+        self::assertDatabaseCount('bitacora', 0);
     }
 
     public function test_failed_database_insert_compensates_uploaded_private_object(): void

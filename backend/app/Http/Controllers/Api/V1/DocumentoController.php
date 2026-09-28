@@ -60,7 +60,7 @@ class DocumentoController extends Controller
     {
         Gate::authorize('update', $documento);
 
-        $documento = $action->execute($documento, $request->validated());
+        $documento = $action->execute($documento, $request->validated(), $request->user());
         $documento->load($this->safeRelations());
 
         return new DocumentoResource($documento);
@@ -69,7 +69,7 @@ class DocumentoController extends Controller
     public function destroy(Documento $documento, DeleteDocumentoAction $action): Response
     {
         Gate::authorize('delete', $documento);
-        $action->execute($documento);
+        $action->execute($documento, request()->user());
 
         return response()->noContent();
     }

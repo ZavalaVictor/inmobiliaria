@@ -7,12 +7,15 @@ use App\Models\Inmueble;
 use App\Models\Operacion;
 use App\Models\Oportunidad;
 use App\Models\User;
+use App\Services\BitacoraService;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class CreateOperacionAction
 {
+    public function __construct(private readonly BitacoraService $bitacora) {}
+
     public function execute(User $user, array $attributes): Operacion
     {
         $values = array_intersect_key($attributes, array_flip([
@@ -77,7 +80,10 @@ final class CreateOperacionAction
                     $operationValues['fecha_operacion'] = $values['fecha_operacion'];
                 }
 
-                return Operacion::create($operationValues);
+                $operation = Operacion::create($operationValues);
+                $this->bitacora->record($user, 'operacion_creada', 'operacion', $operation->getKey(), 'Operación creada.', null, $this->snapshot($operation));
+
+                return $operation;
             });
         } catch (QueryException $exception) {
             if (str_contains($exception->getMessage(), 'uq_operaciones_oportunidad')) {
@@ -99,6 +105,22 @@ final class CreateOperacionAction
             'registradoPor:id,nombres,apellido_paterno,apellido_materno',
             'asignacionesAgentes.agente:id,numero_empleado,user_id',
             'asignacionesAgentes.agente.user:id,nombres,apellido_paterno,apellido_materno',
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function snapshot(Operacion $operacion): array
+    {
+        return [
+            'oportunidad_id' => $operacion->oportunidad_id,
+            'cliente_id' => $operacion->cliente_id,
+            'inmueble_id' => $operacion->inmueble_id,
+            'tipo_operacion' => $operacion->tipo_operacion,
+            'monto' => $operacion->monto,
+            'estado' => $operacion->estado,
+            'fecha_operacion' => $operacion->fecha_operacion,
+            'fecha_inicio_contrato' => $operacion->fecha_inicio_contrato,
+            'fecha_fin_contrato' => $operacion->fecha_fin_contrato,
         ];
     }
 }

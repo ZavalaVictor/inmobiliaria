@@ -68,7 +68,7 @@ class OperacionController extends Controller
     public function destroy(Operacion $operacion, DeleteOperacionAction $action): Response
     {
         Gate::authorize('delete', $operacion);
-        $action->execute($operacion);
+        $action->execute($operacion, request()->user());
 
         return response()->noContent();
     }
@@ -97,7 +97,7 @@ class OperacionController extends Controller
     ): JsonResponse {
         Gate::authorize('update', $operacion);
 
-        return (new OperacionAgenteResource($action->execute($operacion, $request->validated())))
+        return (new OperacionAgenteResource($action->execute($operacion, $request->validated(), $request->user())))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -110,7 +110,7 @@ class OperacionController extends Controller
     ): OperacionAgenteResource {
         Gate::authorize('update', $operacion);
 
-        return new OperacionAgenteResource($action->execute($operacion, $asignacion));
+        return new OperacionAgenteResource($action->execute($operacion, $asignacion, request()->user()));
     }
 
     public function destroyAgent(
@@ -119,7 +119,7 @@ class OperacionController extends Controller
         RemoveAgenteFromOperacionAction $action,
     ): Response {
         Gate::authorize('update', $operacion);
-        $action->execute($operacion, $asignacion);
+        $action->execute($operacion, $asignacion, request()->user());
 
         return response()->noContent();
     }

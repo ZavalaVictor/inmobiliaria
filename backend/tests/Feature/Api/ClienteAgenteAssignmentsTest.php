@@ -46,6 +46,12 @@ class ClienteAgenteAssignmentsTest extends TestCase
             ->assertJsonPath('data.es_principal', true)
             ->assertJsonMissingPath('data.agente.user.password');
         $firstAssignment = ClienteAgente::query()->findOrFail($createdFirst->json('data.id'));
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'cliente_agente_asignado',
+            'entidad' => 'cliente_agente',
+            'entidad_id' => $firstAssignment->id,
+            'user_id' => $admin->id,
+        ]);
 
         $createdSecond = $this->apiPost($this->assignmentUrl($cliente), $admin, [
             'agente_id' => $second->agente->id,
@@ -59,10 +65,20 @@ class ClienteAgenteAssignmentsTest extends TestCase
         $this->apiPatch($this->principalUrl($cliente, $secondAssignment), $admin, [])
             ->assertOk()
             ->assertJsonPath('data.es_principal', true);
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'cliente_agente_principal_cambiado',
+            'entidad_id' => $secondAssignment->id,
+            'user_id' => $admin->id,
+        ]);
 
         self::assertFalse((bool) $firstAssignment->fresh()->es_principal);
         $this->apiDelete($this->assignmentUrl($cliente).'/'.$secondAssignment->id, $admin)
             ->assertNoContent();
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'cliente_agente_desasignado',
+            'entidad_id' => $secondAssignment->id,
+            'user_id' => $admin->id,
+        ]);
         self::assertTrue((bool) $firstAssignment->fresh()->es_principal);
 
         $this->apiDelete($this->assignmentUrl($cliente).'/'.$firstAssignment->id, $admin)

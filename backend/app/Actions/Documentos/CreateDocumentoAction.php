@@ -7,6 +7,7 @@ use App\Enums\MimeTypeDocumento;
 use App\Models\CategoriaDocumento;
 use App\Models\Documento;
 use App\Models\User;
+use App\Services\BitacoraService;
 use App\Services\DocumentoDestinationAccess;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ final class CreateDocumentoAction
     public function __construct(
         private readonly DocumentoPrivateStorage $storage,
         private readonly DocumentoDestinationAccess $destinations,
+        private readonly BitacoraService $bitacora,
     ) {}
 
     /**
@@ -84,7 +86,20 @@ final class CreateDocumentoAction
         }
 
         try {
-            $documento = DB::transaction(fn (): Documento => Documento::create($metadata));
+            $documento = DB::transaction(function () use ($metadata, $actor): Documento {
+                $documento = Documento::create($metadata);
+                $this->bitacora->record(
+                    $actor,
+                    'documento_creado',
+                    'documento',
+                    $documento->getKey(),
+                    'Documento creado.',
+                    null,
+                    $this->snapshot($documento),
+                );
+
+                return $documento;
+            });
         } catch (Throwable $exception) {
             $this->compensate($path, $destination['id']);
 
@@ -113,5 +128,22 @@ final class CreateDocumentoAction
                 'error_type' => $compensationException::class,
             ]);
         }
+    }
+
+    /** @return array<string, mixed> */
+    private function snapshot(Documento $documento): array
+    {
+        return [
+            'categoria_documento_id' => $documento->categoria_documento_id,
+            'propietario_id' => $documento->propietario_id,
+            'cliente_id' => $documento->cliente_id,
+            'inmueble_id' => $documento->inmueble_id,
+            'operacion_id' => $documento->operacion_id,
+            'nombre_original' => $documento->nombre_original,
+            'mime_type' => $documento->mime_type,
+            'tamano_bytes' => $documento->tamano_bytes,
+            'fecha_documento' => $documento->fecha_documento,
+            'fecha_vencimiento' => $documento->fecha_vencimiento,
+        ];
     }
 }
