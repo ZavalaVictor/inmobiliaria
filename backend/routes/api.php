@@ -4,11 +4,13 @@ use App\Http\Controllers\Api\V1\AgenteController;
 use App\Http\Controllers\Api\V1\AgenteInmuebleController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\CategoriaController;
+use App\Http\Controllers\Api\V1\CategoriaDocumentoController;
 use App\Http\Controllers\Api\V1\CitaController;
 use App\Http\Controllers\Api\V1\CitaHistorialController;
 use App\Http\Controllers\Api\V1\ClienteAgenteController;
 use App\Http\Controllers\Api\V1\ClienteController;
 use App\Http\Controllers\Api\V1\ClienteInmuebleInteresController;
+use App\Http\Controllers\Api\V1\DocumentoController;
 use App\Http\Controllers\Api\V1\InmuebleController;
 use App\Http\Controllers\Api\V1\InmuebleImagenController;
 use App\Http\Controllers\Api\V1\InteraccionClienteController;
@@ -50,6 +52,11 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('clientes', ClienteController::class);
         Route::apiResource('agentes', AgenteController::class);
         Route::apiResource('categorias', CategoriaController::class);
+        Route::get('categorias-documentos', [CategoriaDocumentoController::class, 'index']);
+        Route::post('categorias-documentos', [CategoriaDocumentoController::class, 'store']);
+        Route::get('categorias-documentos/{categoria}', [CategoriaDocumentoController::class, 'show']);
+        Route::patch('categorias-documentos/{categoria}', [CategoriaDocumentoController::class, 'update']);
+        Route::delete('categorias-documentos/{categoria}', [CategoriaDocumentoController::class, 'destroy']);
         Route::apiResource('inmuebles', InmuebleController::class);
         Route::apiResource('propietarios', PropietarioController::class);
         Route::patch('citas/{cita}/reprogramar', [CitaController::class, 'reprogramar']);
@@ -78,6 +85,12 @@ Route::prefix('v1')->group(function (): void {
         Route::get('solicitudes/{solicitud}', [SolicitudInformacionController::class, 'show']);
         Route::patch('solicitudes/{solicitud}', [SolicitudInformacionController::class, 'update']);
         Route::delete('solicitudes/{solicitud}', [SolicitudInformacionController::class, 'destroy']);
+        Route::get('documentos', [DocumentoController::class, 'index']);
+        Route::post('documentos', [DocumentoController::class, 'store']);
+        Route::get('documentos/{documento}/descargar', [DocumentoController::class, 'download'])->name('documentos.download');
+        Route::get('documentos/{documento}', [DocumentoController::class, 'show']);
+        Route::patch('documentos/{documento}', [DocumentoController::class, 'update']);
+        Route::delete('documentos/{documento}', [DocumentoController::class, 'destroy']);
         Route::put('users/{user}/roles', [UserController::class, 'updateRoles']);
         Route::apiResource('users', UserController::class);
 

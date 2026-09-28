@@ -41,6 +41,8 @@ return [
         'credentials' => env('FIREBASE_CREDENTIALS'),
         'images_public_url_base' => env('FIREBASE_IMAGES_PUBLIC_URL_BASE'),
         'inmueble_image_max_kb' => (int) env('INMUEBLE_IMAGE_MAX_KB', 10240),
+        'documents_bucket' => env('FIREBASE_DOCUMENTS_BUCKET'),
+        'document_max_kb' => (int) env('DOCUMENT_MAX_KB', 10240),
     ],
 
 ];
