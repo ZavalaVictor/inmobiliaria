@@ -36,7 +36,7 @@ class UserController extends Controller
     {
         Gate::authorize('create', User::class);
 
-        $user = $action->execute($request->validated());
+        $user = $action->execute($request->validated(), $request->user());
         $user->load('roles:id,name,guard_name');
 
         return (new UserResource($user))
@@ -59,7 +59,7 @@ class UserController extends Controller
     ): UserResource {
         Gate::authorize('update', $user);
 
-        return new UserResource($action->execute($user, $request->validated()));
+        return new UserResource($action->execute($user, $request->validated(), $request->user()));
     }
 
     public function updateRoles(
@@ -69,13 +69,13 @@ class UserController extends Controller
     ): UserResource {
         Gate::authorize('assignRoles', $user);
 
-        return new UserResource($action->execute($user, $request->validated('roles')));
+        return new UserResource($action->execute($user, $request->validated('roles'), $request->user()));
     }
 
     public function destroy(User $user, DeleteUserAction $action): Response
     {
         Gate::authorize('delete', $user);
-        $action->execute($user);
+        $action->execute($user, request()->user());
 
         return response()->noContent();
     }

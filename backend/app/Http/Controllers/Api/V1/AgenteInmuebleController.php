@@ -48,7 +48,7 @@ class AgenteInmuebleController extends Controller
         Gate::authorize('update', $inmueble);
         Gate::authorize('create', AgenteInmueble::class);
 
-        return (new AgenteInmuebleResource($action->execute($inmueble, $request->validated())))
+        return (new AgenteInmuebleResource($action->execute($inmueble, $request->validated(), $request->user())))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -62,7 +62,7 @@ class AgenteInmuebleController extends Controller
         Gate::authorize('update', $inmueble);
         Gate::authorize('update', $asignacion);
 
-        return new AgenteInmuebleResource($action->execute($inmueble, $asignacion));
+        return new AgenteInmuebleResource($action->execute($inmueble, $asignacion, request()->user()));
     }
 
     public function destroy(
@@ -72,7 +72,7 @@ class AgenteInmuebleController extends Controller
     ): Response {
         Gate::authorize('update', $inmueble);
         Gate::authorize('delete', $asignacion);
-        $action->execute($inmueble, $asignacion);
+        $action->execute($inmueble, $asignacion, request()->user());
 
         return response()->noContent();
     }

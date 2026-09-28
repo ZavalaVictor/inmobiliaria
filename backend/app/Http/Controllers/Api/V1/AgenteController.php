@@ -36,7 +36,7 @@ class AgenteController extends Controller
     {
         Gate::authorize('create', Agente::class);
 
-        $agente = $action->execute($request->validated());
+        $agente = $action->execute($request->validated(), $request->user());
         $agente->load('user:id,nombres,apellido_paterno,apellido_materno,email,telefono,estado');
 
         return (new AgenteResource($agente))
@@ -59,13 +59,13 @@ class AgenteController extends Controller
     ): AgenteResource {
         Gate::authorize('update', $agente);
 
-        return new AgenteResource($action->execute($agente, $request->validated()));
+        return new AgenteResource($action->execute($agente, $request->validated(), $request->user()));
     }
 
     public function destroy(Agente $agente, DeleteAgenteAction $action): Response
     {
         Gate::authorize('delete', $agente);
-        $action->execute($agente);
+        $action->execute($agente, request()->user());
 
         return response()->noContent();
     }

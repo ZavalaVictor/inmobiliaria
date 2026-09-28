@@ -60,6 +60,12 @@ class OperacionesTest extends TestCase
             ->assertJsonPath('data.monto', '100000.00');
 
         $operation = Operacion::query()->findOrFail($created->json('data.id'));
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'operacion_creada',
+            'entidad' => 'operacion',
+            'entidad_id' => $operation->id,
+            'user_id' => $admin->id,
+        ]);
         self::assertSame('2026-01-15 10:30:00', $operation->fecha_operacion->format('Y-m-d H:i:s'));
 
         $assignment = $this->apiPost('/api/v1/operaciones/'.$operation->id.'/agentes', $admin, [
@@ -69,6 +75,12 @@ class OperacionesTest extends TestCase
             ->assertJsonPath('data.es_principal', true)
             ->assertJsonPath('data.porcentaje_comision', '3.50')
             ->assertJsonPath('data.monto_comision', '3500.00');
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'operacion_agente_asignado',
+            'entidad' => 'operacion_agente',
+            'entidad_id' => $assignment->json('data.id'),
+            'user_id' => $admin->id,
+        ]);
 
         $this->apiGet('/api/v1/operaciones', $admin)->assertOk()->assertJsonCount(1, 'data');
         $this->apiGet('/api/v1/operaciones/'.$operation->id, $admin)
@@ -82,11 +94,26 @@ class OperacionesTest extends TestCase
             'fecha_fin_contrato' => '2027-01-15',
             'observaciones' => 'Anulada administrativamente',
         ])->assertOk()->assertJsonPath('data.estado', 'anulada');
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'operacion_actualizada',
+            'entidad_id' => $operation->id,
+            'user_id' => $admin->id,
+        ]);
 
         $assignmentModel = OperacionAgente::query()->findOrFail($assignment->json('data.id'));
         $this->apiDelete('/api/v1/operaciones/'.$operation->id.'/agentes/'.$assignmentModel->id, $admin)
             ->assertNoContent();
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'operacion_agente_desasignado',
+            'entidad_id' => $assignmentModel->id,
+            'user_id' => $admin->id,
+        ]);
         $this->apiDelete('/api/v1/operaciones/'.$operation->id, $admin)->assertNoContent();
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'operacion_eliminada',
+            'entidad_id' => $operation->id,
+            'user_id' => $admin->id,
+        ]);
         self::assertDatabaseMissing('operaciones', ['id' => $operation->id]);
         self::assertDatabaseHas('clientes', ['id' => $client->id]);
         self::assertDatabaseHas('inmuebles', ['id' => $property->id]);
@@ -235,6 +262,12 @@ class OperacionesTest extends TestCase
         $secondAssignment = OperacionAgente::findOrFail($secondResponse->json('data.id'));
         $this->apiPatch('/api/v1/operaciones/'.$operation->id.'/agentes/'.$secondAssignment->id.'/principal', $admin, [])
             ->assertOk()->assertJsonPath('data.es_principal', true);
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'operacion_agente_principal_cambiado',
+            'entidad' => 'operacion_agente',
+            'entidad_id' => $secondAssignment->id,
+            'user_id' => $admin->id,
+        ]);
         $this->apiPost('/api/v1/operaciones/'.$operation->id.'/agentes', $admin, [
             'agente_id' => $second->agente->id,
         ])->assertUnprocessable();

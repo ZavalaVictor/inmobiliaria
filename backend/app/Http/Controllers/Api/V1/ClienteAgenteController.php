@@ -48,7 +48,7 @@ class ClienteAgenteController extends Controller
         Gate::authorize('update', $cliente);
         Gate::authorize('create', ClienteAgente::class);
 
-        return (new ClienteAgenteResource($action->execute($cliente, $request->validated())))
+        return (new ClienteAgenteResource($action->execute($cliente, $request->validated(), $request->user())))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -62,7 +62,7 @@ class ClienteAgenteController extends Controller
         Gate::authorize('update', $cliente);
         Gate::authorize('update', $asignacion);
 
-        return new ClienteAgenteResource($action->execute($cliente, $asignacion));
+        return new ClienteAgenteResource($action->execute($cliente, $asignacion, request()->user()));
     }
 
     public function destroy(
@@ -72,7 +72,7 @@ class ClienteAgenteController extends Controller
     ): Response {
         Gate::authorize('update', $cliente);
         Gate::authorize('delete', $asignacion);
-        $action->execute($cliente, $asignacion);
+        $action->execute($cliente, $asignacion, request()->user());
 
         return response()->noContent();
     }

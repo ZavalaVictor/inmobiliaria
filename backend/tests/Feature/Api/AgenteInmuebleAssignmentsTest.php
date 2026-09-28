@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\Agente;
 use App\Models\AgenteInmueble;
+use App\Models\Bitacora;
 use App\Models\Categoria;
 use App\Models\Inmueble;
 use App\Models\Propietario;
@@ -49,6 +50,12 @@ class AgenteInmuebleAssignmentsTest extends TestCase
             ->assertJsonMissingPath('data.agente.user.password');
 
         $firstAssignment = AgenteInmueble::query()->findOrFail($first->json('data.id'));
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'agente_inmueble_asignado',
+            'entidad' => 'agente_inmueble',
+            'entidad_id' => $firstAssignment->id,
+            'user_id' => $admin->id,
+        ]);
 
         $second = $this->apiPost($this->assignmentUrl($property), $admin, [
             'agente_id' => $secondAgent->agente->id,
@@ -65,12 +72,22 @@ class AgenteInmuebleAssignmentsTest extends TestCase
         $this->apiPatch($this->principalUrl($property, $secondAssignment), $admin, [])
             ->assertOk()
             ->assertJsonPath('data.es_principal', true);
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'agente_inmueble_principal_cambiado',
+            'entidad_id' => $secondAssignment->id,
+            'user_id' => $admin->id,
+        ]);
 
         self::assertFalse((bool) $firstAssignment->fresh()->es_principal);
         self::assertTrue((bool) $secondAssignment->fresh()->es_principal);
 
         $this->apiDelete($this->assignmentUrl($property).'/'.$secondAssignment->id, $admin)
             ->assertNoContent();
+        $this->assertDatabaseHas('bitacora', [
+            'accion' => 'agente_inmueble_desasignado',
+            'entidad_id' => $secondAssignment->id,
+            'user_id' => $admin->id,
+        ]);
 
         self::assertTrue((bool) $firstAssignment->fresh()->es_principal);
 
@@ -231,6 +248,7 @@ class AgenteInmuebleAssignmentsTest extends TestCase
             'inmueble_id' => $property->id,
             'es_principal' => false,
         ]);
+        $beforePrincipalEvents = Bitacora::query()->where('accion', 'agente_inmueble_principal_cambiado')->count();
 
         $this->apiPatch($this->principalUrl($property, $first), $admin, [])
             ->assertOk()
@@ -239,6 +257,7 @@ class AgenteInmuebleAssignmentsTest extends TestCase
         self::assertDatabaseCount('agente_inmueble', 2);
         self::assertTrue((bool) $first->fresh()->es_principal);
         self::assertFalse((bool) $second->fresh()->es_principal);
+        self::assertSame($beforePrincipalEvents, Bitacora::query()->where('accion', 'agente_inmueble_principal_cambiado')->count());
     }
 
     public function test_delete_principal_promotes_by_date_then_id_and_last_delete_leaves_none(): void

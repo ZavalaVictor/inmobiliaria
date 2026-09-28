@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AgenteController;
 use App\Http\Controllers\Api\V1\AgenteInmuebleController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\BitacoraController;
 use App\Http\Controllers\Api\V1\CategoriaController;
 use App\Http\Controllers\Api\V1\CategoriaDocumentoController;
 use App\Http\Controllers\Api\V1\CitaController;
@@ -101,6 +102,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('visualizaciones-inmuebles', [VisualizacionInmuebleController::class, 'index']);
         Route::get('historial-correos', [HistorialCorreoController::class, 'index'])->name('historial-correos.index');
         Route::get('historial-correos/{correo}', [HistorialCorreoController::class, 'show'])->name('historial-correos.show');
+        Route::get('bitacora', [BitacoraController::class, 'index']);
+        Route::get('bitacora/exportar', [BitacoraController::class, 'export']);
+        Route::get('bitacora/{registro}', [BitacoraController::class, 'show']);
         Route::put('users/{user}/roles', [UserController::class, 'updateRoles']);
         Route::apiResource('users', UserController::class);
 
