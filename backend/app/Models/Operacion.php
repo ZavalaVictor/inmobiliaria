@@ -27,6 +27,23 @@ class Operacion extends Model
         'observaciones',
     ];
 
+    protected function childRouteBindingRelationshipName($childType): string
+    {
+        return match ($childType) {
+            'asignacion' => 'asignacionesAgentes',
+            default => parent::childRouteBindingRelationshipName($childType),
+        };
+    }
+
+    protected function resolveChildRouteBindingQuery($childType, $value, $field)
+    {
+        $query = parent::resolveChildRouteBindingQuery($childType, $value, $field);
+
+        return $childType === 'asignacion'
+            ? $query->whereHas('agente')
+            : $query;
+    }
+
     protected function casts(): array
     {
         return [
