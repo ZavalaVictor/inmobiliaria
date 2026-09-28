@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\V1\InmuebleController;
 use App\Http\Controllers\Api\V1\InmuebleImagenController;
 use App\Http\Controllers\Api\V1\InteraccionClienteController;
 use App\Http\Controllers\Api\V1\PropietarioController;
+use App\Http\Controllers\Api\V1\PublicSolicitudInformacionController;
+use App\Http\Controllers\Api\V1\SolicitudInformacionController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +24,9 @@ Route::get('/health', function () {
 });
 
 Route::prefix('v1')->group(function (): void {
+    Route::post('public/solicitudes', [PublicSolicitudInformacionController::class, 'store'])
+        ->middleware('throttle:10,1');
+
     Route::prefix('auth')->group(function (): void {
         Route::post('login', [AuthController::class, 'login'])
             ->middleware('throttle:auth-login');
@@ -42,6 +47,11 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('categorias', CategoriaController::class);
         Route::apiResource('inmuebles', InmuebleController::class);
         Route::apiResource('propietarios', PropietarioController::class);
+        Route::get('solicitudes', [SolicitudInformacionController::class, 'index']);
+        Route::post('solicitudes', [SolicitudInformacionController::class, 'store']);
+        Route::get('solicitudes/{solicitud}', [SolicitudInformacionController::class, 'show']);
+        Route::patch('solicitudes/{solicitud}', [SolicitudInformacionController::class, 'update']);
+        Route::delete('solicitudes/{solicitud}', [SolicitudInformacionController::class, 'destroy']);
         Route::put('users/{user}/roles', [UserController::class, 'updateRoles']);
         Route::apiResource('users', UserController::class);
 
