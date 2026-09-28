@@ -20,8 +20,10 @@ use App\Http\Controllers\Api\V1\OportunidadController;
 use App\Http\Controllers\Api\V1\OportunidadHistorialController;
 use App\Http\Controllers\Api\V1\PropietarioController;
 use App\Http\Controllers\Api\V1\PublicSolicitudInformacionController;
+use App\Http\Controllers\Api\V1\PublicVisualizacionInmuebleController;
 use App\Http\Controllers\Api\V1\SolicitudInformacionController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\VisualizacionInmuebleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
@@ -34,6 +36,8 @@ Route::get('/health', function () {
 Route::prefix('v1')->group(function (): void {
     Route::post('public/solicitudes', [PublicSolicitudInformacionController::class, 'store'])
         ->middleware('throttle:10,1');
+    Route::post('public/inmuebles/{inmueble}/visualizaciones', [PublicVisualizacionInmuebleController::class, 'store'])
+        ->middleware('throttle:60,1');
 
     Route::prefix('auth')->group(function (): void {
         Route::post('login', [AuthController::class, 'login'])
@@ -92,6 +96,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('documentos/{documento}', [DocumentoController::class, 'show']);
         Route::patch('documentos/{documento}', [DocumentoController::class, 'update']);
         Route::delete('documentos/{documento}', [DocumentoController::class, 'destroy']);
+        Route::post('inmuebles/{inmueble}/visualizaciones', [VisualizacionInmuebleController::class, 'storePortal'])
+            ->middleware('throttle:60,1');
+        Route::get('visualizaciones-inmuebles', [VisualizacionInmuebleController::class, 'index']);
         Route::get('historial-correos', [HistorialCorreoController::class, 'index'])->name('historial-correos.index');
         Route::get('historial-correos/{correo}', [HistorialCorreoController::class, 'show'])->name('historial-correos.show');
         Route::put('users/{user}/roles', [UserController::class, 'updateRoles']);
