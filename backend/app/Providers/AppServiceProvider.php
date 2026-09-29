@@ -21,6 +21,7 @@ use App\Services\SymfonyBackupProcessRunner;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -54,10 +55,19 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         ResetPassword::createUrlUsing(function (object $user, string $token): string {
-            return rtrim((string) config('app.frontend_url'), '/').'/reset-password?'.http_build_query([
-                'token' => $token,
-                'email' => $user->getEmailForPasswordReset(),
-            ]);
+            return $this->frontendPasswordResetUrl($user, $token);
+        });
+
+        ResetPassword::toMailUsing(function (object $user, string $token): MailMessage {
+            $url = $this->frontendPasswordResetUrl($user, $token);
+
+            return (new MailMessage)->view([
+                'html' => 'emails.auth.password-reset',
+                'text' => 'emails.auth.password-reset-text',
+            ], [
+                'url' => $url,
+                'expires' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire'),
+            ])->subject('Solicitud para restablecer tu contraseña');
         });
 
         RateLimiter::for('auth-login', function (Request $request): Limit {
@@ -76,5 +86,13 @@ class AppServiceProvider extends ServiceProvider
     private function authRateLimitKey(Request $request): string
     {
         return Str::lower((string) $request->input('email')).'|'.$request->ip();
+    }
+
+    private function frontendPasswordResetUrl(object $user, string $token): string
+    {
+        return rtrim((string) config('app.frontend_url'), '/').'/nueva-contrasena?'.http_build_query([
+            'token' => $token,
+            'email' => $user->getEmailForPasswordReset(),
+        ], '', '&', PHP_QUERY_RFC3986);
     }
 }

@@ -8,3 +8,9 @@ body {
   color: #0f172a;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
 }
+
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}

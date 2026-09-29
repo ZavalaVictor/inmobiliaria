@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Enums\EstadoUsuario;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -160,6 +161,29 @@ class AuthenticationTest extends TestCase
         $existing->assertAccepted();
         $unknown->assertAccepted();
         self::assertSame($existing->json('message'), $unknown->json('message'));
+    }
+
+    public function test_forgot_password_notification_uses_the_frontend_reset_url(): void
+    {
+        Notification::fake();
+
+        $this->spaPost('/api/v1/auth/forgot-password', [
+            'email' => $this->user->email,
+        ])->assertAccepted();
+
+        Notification::assertSentTo($this->user, ResetPassword::class, function (ResetPassword $notification): bool {
+            $mail = $notification->toMail($this->user);
+            $url = $mail->viewData['url'] ?? null;
+
+            return $mail->view === [
+                'html' => 'emails.auth.password-reset',
+                'text' => 'emails.auth.password-reset-text',
+            ]
+                && is_string($url)
+                && str_starts_with($url, 'http://localhost:5173/nueva-contrasena?')
+                && str_contains($url, 'email=usuario%40example.test')
+                && str_contains($url, 'token=');
+        });
     }
 
     public function test_valid_reset_token_changes_password(): void
