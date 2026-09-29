@@ -33,7 +33,7 @@ final class UpdateOportunidadAction
             'cliente:id,nombres,apellido_paterno,apellido_materno',
             'inmueble:id,codigo,titulo,slug,publicado',
             'agentePrincipal:id,numero_empleado,user_id',
-            'agentePrincipal.user:id,nombres,apellido_paterno,apellido_materno',
+            'agentePrincipal.user:id,nombres,apellido_paterno,apellido_materno,email',
             'solicitudInformacion:id,nombre,estado,medio_preferido',
         ];
     }

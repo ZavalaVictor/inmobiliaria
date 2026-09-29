@@ -5,10 +5,13 @@ namespace App\Actions\Solicitudes;
 use App\Enums\EstadoSolicitudInformacion;
 use App\Models\Inmueble;
 use App\Models\SolicitudInformacion;
+use App\Services\Solicitudes\SolicitudNotificationDispatcher;
 use Illuminate\Validation\ValidationException;
 
 final class CreatePublicSolicitudInformacionAction
 {
+    public function __construct(private readonly SolicitudNotificationDispatcher $notifications) {}
+
     /**
      * @param  array<string, mixed>  $attributes
      */
@@ -33,7 +36,7 @@ final class CreatePublicSolicitudInformacionAction
             }
         }
 
-        return SolicitudInformacion::create([
+        $solicitud = SolicitudInformacion::create([
             ...$values,
             'cliente_id' => null,
             'atendida_por_user_id' => null,
@@ -41,5 +44,9 @@ final class CreatePublicSolicitudInformacionAction
             'origen' => 'landing_publica',
             'fecha_atencion' => null,
         ]);
+
+        $this->notifications->publicCreated($solicitud);
+
+        return $solicitud;
     }
 }

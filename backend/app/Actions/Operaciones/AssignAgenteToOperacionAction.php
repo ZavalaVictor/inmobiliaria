@@ -8,6 +8,7 @@ use App\Models\OperacionAgente;
 use App\Models\User;
 use App\Services\BitacoraService;
 use App\Services\Operaciones\OperacionCommissionCalculator;
+use App\Services\Operaciones\OperacionNotificationDispatcher;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -17,6 +18,7 @@ final class AssignAgenteToOperacionAction
     public function __construct(
         private readonly OperacionCommissionCalculator $calculator,
         private readonly BitacoraService $bitacora,
+        private readonly OperacionNotificationDispatcher $notifications,
     ) {}
 
     public function execute(Operacion $operacion, array $attributes, ?User $actor = null): OperacionAgente
@@ -74,14 +76,19 @@ final class AssignAgenteToOperacionAction
             throw $exception;
         }
 
-        return $assignment->fresh($this->relations());
+        $assignment = $assignment->fresh($this->relations());
+        if ($assignment->agente !== null) {
+            $this->notifications->assigned($operacion->fresh(), $assignment->agente, $actor);
+        }
+
+        return $assignment;
     }
 
     private function relations(): array
     {
         return [
             'agente:id,numero_empleado,user_id',
-            'agente.user:id,nombres,apellido_paterno,apellido_materno',
+            'agente.user:id,nombres,apellido_paterno,apellido_materno,email',
         ];
     }
 }

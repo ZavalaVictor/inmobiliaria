@@ -8,13 +8,14 @@ use App\Models\Operacion;
 use App\Models\Oportunidad;
 use App\Models\User;
 use App\Services\BitacoraService;
+use App\Services\Operaciones\OperacionNotificationDispatcher;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class CreateOperacionAction
 {
-    public function __construct(private readonly BitacoraService $bitacora) {}
+    public function __construct(private readonly BitacoraService $bitacora, private readonly OperacionNotificationDispatcher $notifications) {}
 
     public function execute(User $user, array $attributes): Operacion
     {
@@ -93,7 +94,14 @@ final class CreateOperacionAction
             throw $exception;
         }
 
-        return $operation->fresh($this->relations());
+        $operation = $operation->fresh($this->relations());
+        foreach ($operation->asignacionesAgentes as $assignment) {
+            if ($assignment->agente !== null) {
+                $this->notifications->assigned($operation, $assignment->agente, $user);
+            }
+        }
+
+        return $operation;
     }
 
     private function relations(): array
@@ -104,7 +112,7 @@ final class CreateOperacionAction
             'oportunidad:id,titulo,etapa,estado',
             'registradoPor:id,nombres,apellido_paterno,apellido_materno',
             'asignacionesAgentes.agente:id,numero_empleado,user_id',
-            'asignacionesAgentes.agente.user:id,nombres,apellido_paterno,apellido_materno',
+            'asignacionesAgentes.agente.user:id,nombres,apellido_paterno,apellido_materno,email',
         ];
     }
 

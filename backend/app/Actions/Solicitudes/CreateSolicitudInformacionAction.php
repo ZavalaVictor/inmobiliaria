@@ -7,12 +7,15 @@ use App\Models\Cliente;
 use App\Models\Inmueble;
 use App\Models\SolicitudInformacion;
 use App\Models\User;
+use App\Services\Solicitudes\SolicitudNotificationDispatcher;
 use App\Support\Authorization\ActorScope;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 final class CreateSolicitudInformacionAction
 {
+    public function __construct(private readonly SolicitudNotificationDispatcher $notifications) {}
+
     /**
      * @param  array<string, mixed>  $attributes
      */
@@ -42,13 +45,17 @@ final class CreateSolicitudInformacionAction
 
         $this->validateRelations($user, $values);
 
-        return SolicitudInformacion::create([
+        $solicitud = SolicitudInformacion::create([
             ...$values,
             'estado' => EstadoSolicitudInformacion::Nueva->value,
             'origen' => ActorScope::isClient($user) ? 'portal_cliente' : 'registro_interno',
             'atendida_por_user_id' => null,
             'fecha_atencion' => null,
         ])->fresh($this->relations());
+
+        $this->notifications->created($solicitud, $user);
+
+        return $solicitud;
     }
 
     /**

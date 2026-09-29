@@ -6,6 +6,7 @@ use App\Enums\EstadoCorreo;
 use App\Enums\TipoCorreo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class HistorialCorreo extends Model
 {
@@ -15,6 +16,8 @@ class HistorialCorreo extends Model
         'destinatario_user_id',
         'cliente_id',
         'cita_id',
+        'relacionado_type',
+        'relacionado_id',
         'enviado_por_user_id',
         'destinatario_email',
         'destinatario_nombre',
@@ -49,6 +52,11 @@ class HistorialCorreo extends Model
     public function cita(): BelongsTo
     {
         return $this->belongsTo(Cita::class, 'cita_id');
+    }
+
+    public function relacionado(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     public function enviadoPor(): BelongsTo

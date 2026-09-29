@@ -9,6 +9,7 @@ use App\Models\Documento;
 use App\Models\User;
 use App\Services\BitacoraService;
 use App\Services\DocumentoDestinationAccess;
+use App\Services\Documentos\DocumentoNotificationDispatcher;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -22,6 +23,7 @@ final class CreateDocumentoAction
         private readonly DocumentoPrivateStorage $storage,
         private readonly DocumentoDestinationAccess $destinations,
         private readonly BitacoraService $bitacora,
+        private readonly DocumentoNotificationDispatcher $notifications,
     ) {}
 
     /**
@@ -106,7 +108,10 @@ final class CreateDocumentoAction
             throw $exception;
         }
 
-        return $documento->fresh();
+        $documento = $documento->fresh();
+        $this->notifications->created($documento, $actor);
+
+        return $documento;
     }
 
     private function sanitizeOriginalName(string $name): string

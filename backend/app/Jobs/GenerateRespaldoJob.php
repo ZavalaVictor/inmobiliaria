@@ -8,6 +8,7 @@ use App\Contracts\DatabaseBackupService;
 use App\Exceptions\BackupLockUnavailableException;
 use App\Models\Respaldo;
 use App\Services\BitacoraService;
+use App\Services\Respaldos\RespaldoNotificationDispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -30,9 +31,10 @@ class GenerateRespaldoJob implements ShouldQueue
         BackupPrivateStorage $storage,
         BackupOperationLock $lock,
         BitacoraService $bitacora,
+        ?RespaldoNotificationDispatcher $notifications = null,
     ): void {
         try {
-            $lock->execute(function () use ($backupService, $storage, $bitacora): void {
+            $lock->execute(function () use ($backupService, $storage, $bitacora, $notifications): void {
                 $respaldo = Respaldo::query()->find($this->respaldoId);
                 if ($respaldo === null || ($respaldo->estado?->value ?? $respaldo->estado) !== 'pendiente') {
                     return;
@@ -41,6 +43,7 @@ class GenerateRespaldoJob implements ShouldQueue
                 $respaldo->update(['estado' => 'en_proceso']);
                 $temporaryPath = $storage->temporaryPath();
                 $finalized = false;
+                $succeeded = false;
 
                 try {
                     $backupService->dumpTo($temporaryPath);
@@ -77,6 +80,7 @@ class GenerateRespaldoJob implements ShouldQueue
                             ],
                         );
                     });
+                    $succeeded = true;
                 } catch (Throwable $exception) {
                     try {
                         if ($finalized || $storage->exists($respaldo->ruta_archivo)) {
@@ -111,6 +115,21 @@ class GenerateRespaldoJob implements ShouldQueue
                 } finally {
                     if (is_file($temporaryPath)) {
                         @unlink($temporaryPath);
+                    }
+                }
+
+                if ($notifications !== null) {
+                    try {
+                        $respaldo->load('generadoPor');
+                        if ($succeeded && ($respaldo->tipo?->value ?? $respaldo->tipo) === 'manual') {
+                            $notifications->manualCompleted($respaldo);
+                        } elseif (! $succeeded && ($respaldo->tipo?->value ?? $respaldo->tipo) === 'automatico') {
+                            $notifications->automaticFailed($respaldo);
+                        } elseif (! $succeeded) {
+                            $notifications->manualFailed($respaldo);
+                        }
+                    } catch (Throwable $notificationException) {
+                        report($notificationException);
                     }
                 }
             });

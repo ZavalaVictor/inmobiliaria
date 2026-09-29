@@ -5,24 +5,32 @@ namespace App\Actions\Operaciones;
 use App\Models\Operacion;
 use App\Models\User;
 use App\Services\BitacoraService;
+use App\Services\Operaciones\OperacionNotificationDispatcher;
 use Illuminate\Support\Facades\DB;
 
 final class UpdateOperacionAction
 {
-    public function __construct(private readonly BitacoraService $bitacora) {}
+    public function __construct(private readonly BitacoraService $bitacora, private readonly OperacionNotificationDispatcher $notifications) {}
 
     public function execute(User $user, Operacion $operacion, array $attributes): Operacion
     {
         $values = array_intersect_key($attributes, array_flip([
             'estado', 'fecha_inicio_contrato', 'fecha_fin_contrato', 'observaciones',
         ]));
+        $previousState = $operacion->estado?->value ?? $operacion->estado;
         DB::transaction(function () use ($user, $operacion, $values): void {
             $before = $this->snapshot($operacion);
             $operacion->update($values);
             $this->bitacora->record($user, 'operacion_actualizada', 'operacion', $operacion->getKey(), 'Operación actualizada.', $before, $this->snapshot($operacion));
         });
 
-        return $operacion->fresh($this->relations());
+        $updated = $operacion->fresh($this->relations());
+        $newState = $updated->estado?->value ?? $updated->estado;
+        if ($previousState !== $newState && $newState === 'anulada') {
+            $this->notifications->terminal($updated, $user);
+        }
+
+        return $updated;
     }
 
     private function relations(): array

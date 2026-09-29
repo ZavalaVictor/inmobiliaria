@@ -53,11 +53,11 @@ final class UpdateSolicitudInformacionAction
         $updated = $solicitud->fresh([
             'cliente:id,nombres,apellido_paterno,apellido_materno',
             'inmueble:id,codigo,titulo,slug,publicado',
-            'atendidaPor:id,nombres,apellido_paterno,apellido_materno',
+            'atendidaPor:id,nombres,apellido_paterno,apellido_materno,email',
         ]);
 
         if ($shouldNotifyAssignment) {
-            $this->notifications->assigned($updated);
+            $this->notifications->assigned($updated, $user);
         }
 
         return $updated;

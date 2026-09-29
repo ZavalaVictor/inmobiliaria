@@ -11,6 +11,7 @@ use App\Exceptions\BackupRestoreException;
 use App\Models\Respaldo;
 use App\Models\User;
 use App\Services\BitacoraService;
+use App\Services\Respaldos\RespaldoNotificationDispatcher;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -22,6 +23,7 @@ class RestoreRespaldoAction
         private readonly BackupOperationLock $lock,
         private readonly RestoreOperationJournal $journal,
         private readonly BitacoraService $bitacora,
+        private readonly ?RespaldoNotificationDispatcher $notifications = null,
     ) {}
 
     public function execute(User $actor, Respaldo $respaldo): Respaldo
@@ -67,6 +69,11 @@ class RestoreRespaldoAction
                         ['estado_restauracion' => 'en_proceso'],
                         ['estado_restauracion' => 'completada'],
                     );
+                    try {
+                        $this->notifications?->restoreCompleted($respaldo, $actor);
+                    } catch (Throwable $notificationException) {
+                        report($notificationException);
+                    }
                     $this->journal->append('restore_completed', $context + ['resultado' => 'completada']);
 
                     return $respaldo->fresh(['generadoPor', 'restauradoPor']);
@@ -92,6 +99,11 @@ class RestoreRespaldoAction
                                         ['estado_restauracion' => 'en_proceso'],
                                         ['estado_restauracion' => 'fallida'],
                                     );
+                                } catch (Throwable) {
+                                    report($exception);
+                                }
+                                try {
+                                    $this->notifications?->restoreFailed($current, $actor);
                                 } catch (Throwable) {
                                     report($exception);
                                 }

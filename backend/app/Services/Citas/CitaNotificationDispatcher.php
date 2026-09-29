@@ -63,6 +63,8 @@ final class CitaNotificationDispatcher
                 'destinatario_user_id' => $recipient['user']?->getKey(),
                 'cliente_id' => $cita->cliente_id,
                 'cita_id' => $cita->getKey(),
+                'relacionado_type' => $cita->getMorphClass(),
+                'relacionado_id' => $cita->getKey(),
                 'enviado_por_user_id' => $actor->getKey(),
                 'destinatario_email' => $recipient['email'],
                 'destinatario_nombre' => $recipient['name'],

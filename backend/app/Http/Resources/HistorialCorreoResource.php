@@ -2,6 +2,12 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Cita;
+use App\Models\Documento;
+use App\Models\Operacion;
+use App\Models\Oportunidad;
+use App\Models\Respaldo;
+use App\Models\SolicitudInformacion;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,6 +26,10 @@ class HistorialCorreoResource extends JsonResource
             'destinatario_user_id' => $this->destinatario_user_id,
             'cliente_id' => $this->cliente_id,
             'cita_id' => $this->cita_id,
+            'relacionado' => $this->when($this->relacionado_type !== null, [
+                'tipo' => $this->relatedTypeName($this->relacionado_type),
+                'id' => $this->relacionado_id,
+            ]),
             'enviado_por_user_id' => $this->enviado_por_user_id,
             'destinatario_email' => $this->destinatario_email,
             'destinatario_nombre' => $this->destinatario_nombre,
@@ -64,5 +74,18 @@ class HistorialCorreoResource extends JsonResource
                 ];
             }),
         ];
+    }
+
+    private function relatedTypeName(?string $type): ?string
+    {
+        return match ($type) {
+            SolicitudInformacion::class => 'solicitud',
+            Oportunidad::class => 'oportunidad',
+            Operacion::class => 'operacion',
+            Documento::class => 'documento',
+            Respaldo::class => 'respaldo',
+            Cita::class => 'cita',
+            default => null,
+        };
     }
 }
