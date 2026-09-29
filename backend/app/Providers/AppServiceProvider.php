@@ -2,10 +2,22 @@
 
 namespace App\Providers;
 
+use App\Contracts\BackupOperationLock;
+use App\Contracts\BackupPrivateStorage;
+use App\Contracts\BackupProcessRunner;
+use App\Contracts\DatabaseBackupService;
+use App\Contracts\DatabaseRestoreService;
 use App\Contracts\DocumentoPrivateStorage;
 use App\Contracts\InmuebleImageStorage;
+use App\Contracts\RestoreOperationJournal;
+use App\Services\FileBackupOperationLock;
 use App\Services\FirebaseDocumentoPrivateStorage;
 use App\Services\FirebaseInmuebleImageStorage;
+use App\Services\JsonRestoreOperationJournal;
+use App\Services\LocalBackupPrivateStorage;
+use App\Services\MariaDbBackupService;
+use App\Services\MariaDbRestoreService;
+use App\Services\SymfonyBackupProcessRunner;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -20,6 +32,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(BackupPrivateStorage::class, LocalBackupPrivateStorage::class);
+        $this->app->bind(BackupProcessRunner::class, SymfonyBackupProcessRunner::class);
+        $this->app->bind(DatabaseBackupService::class, MariaDbBackupService::class);
+        $this->app->bind(DatabaseRestoreService::class, MariaDbRestoreService::class);
+        $this->app->bind(BackupOperationLock::class, FileBackupOperationLock::class);
+        $this->app->bind(RestoreOperationJournal::class, JsonRestoreOperationJournal::class);
+
         $this->app->bind(DocumentoPrivateStorage::class, function (): DocumentoPrivateStorage {
             return app(FirebaseDocumentoPrivateStorage::class);
         });

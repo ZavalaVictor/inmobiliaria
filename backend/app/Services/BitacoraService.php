@@ -34,6 +34,12 @@ class BitacoraService
         'operacion_agente_asignado',
         'operacion_agente_principal_cambiado',
         'operacion_agente_desasignado',
+        'respaldo_creado',
+        'respaldo_completado',
+        'respaldo_fallido',
+        'configuracion_respaldo_actualizada',
+        'restauracion_completada',
+        'restauracion_fallida',
     ];
 
     public const ENTITIES = [
@@ -44,6 +50,8 @@ class BitacoraService
         'documento',
         'operacion',
         'operacion_agente',
+        'respaldo',
+        'configuracion_respaldo',
     ];
 
     private const SENSITIVE_KEYS = [
