@@ -7,6 +7,7 @@ use App\Models\Cita;
 use App\Models\CitaHistorial;
 use App\Models\User;
 use App\Services\Citas\CitaAvailabilityService;
+use App\Services\Citas\CitaNotificationDispatcher;
 use App\Support\Authorization\ActorScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -14,11 +15,14 @@ use Illuminate\Validation\ValidationException;
 
 final class ReprogramarCitaAction
 {
-    public function __construct(private readonly CitaAvailabilityService $availability) {}
+    public function __construct(
+        private readonly CitaAvailabilityService $availability,
+        private readonly CitaNotificationDispatcher $notifications,
+    ) {}
 
     public function execute(User $user, Cita $cita, array $attributes): Cita
     {
-        $updated = DB::transaction(function () use ($user, $cita, $attributes): Cita {
+        [$updated, $history] = DB::transaction(function () use ($user, $cita, $attributes): array {
             $locked = Cita::query()->whereKey($cita->getKey())->lockForUpdate()->firstOrFail();
             $newAgentId = $this->resolveAgent($user, $locked, $attributes);
             $agentIds = [$locked->agente_id, $newAgentId];
@@ -31,7 +35,7 @@ final class ReprogramarCitaAction
             $agentChanged = (int) $locked->agente_id !== $newAgentId;
 
             if (! $datesChanged && ! $agentChanged) {
-                return $locked;
+                return [$locked, null];
             }
 
             $this->assertAgentIsAssigned($locked, $newAgentId);
@@ -46,7 +50,7 @@ final class ReprogramarCitaAction
                 'fecha_fin' => $newEnd,
             ]);
 
-            CitaHistorial::create([
+            $history = CitaHistorial::create([
                 'cita_id' => $locked->getKey(),
                 'modificado_por_user_id' => $user->getKey(),
                 'agente_anterior_id' => $oldAgentId,
@@ -63,10 +67,16 @@ final class ReprogramarCitaAction
                 },
             ]);
 
-            return $locked;
+            return [$locked, $history];
         });
 
-        return $updated->fresh($this->relations());
+        $updated = $updated->fresh($this->relations());
+
+        if ($history instanceof CitaHistorial) {
+            $this->notifications->rescheduled($updated, $history, $user);
+        }
+
+        return $updated;
     }
 
     private function resolveAgent(User $user, Cita $cita, array $attributes): int

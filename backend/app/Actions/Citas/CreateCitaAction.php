@@ -9,6 +9,7 @@ use App\Models\Inmueble;
 use App\Models\Oportunidad;
 use App\Models\User;
 use App\Services\Citas\CitaAvailabilityService;
+use App\Services\Citas\CitaNotificationDispatcher;
 use App\Support\Authorization\ActorScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -16,7 +17,10 @@ use Illuminate\Validation\ValidationException;
 
 final class CreateCitaAction
 {
-    public function __construct(private readonly CitaAvailabilityService $availability) {}
+    public function __construct(
+        private readonly CitaAvailabilityService $availability,
+        private readonly CitaNotificationDispatcher $notifications,
+    ) {}
 
     public function execute(User $user, array $attributes): Cita
     {
@@ -69,7 +73,10 @@ final class CreateCitaAction
             ]);
         });
 
-        return $cita->fresh($this->relations());
+        $cita = $cita->fresh($this->relations());
+        $this->notifications->created($cita, $user);
+
+        return $cita;
     }
 
     private function resolveAgent(User $user, array $values): int

@@ -5,21 +5,26 @@ namespace App\Actions\Citas;
 use App\Models\Cita;
 use App\Models\User;
 use App\Services\Citas\CitaAvailabilityService;
+use App\Services\Citas\CitaNotificationDispatcher;
 use Illuminate\Support\Facades\DB;
 
 final class UpdateEstadoCitaAction
 {
-    public function __construct(private readonly CitaAvailabilityService $availability) {}
+    public function __construct(
+        private readonly CitaAvailabilityService $availability,
+        private readonly CitaNotificationDispatcher $notifications,
+    ) {}
 
     public function execute(User $user, Cita $cita, array $attributes): Cita
     {
-        $updated = DB::transaction(function () use ($cita, $attributes): Cita {
+        [$updated, $cancelled] = DB::transaction(function () use ($cita, $attributes): array {
             $locked = Cita::query()->whereKey($cita->getKey())->lockForUpdate()->firstOrFail();
             $next = $attributes['estado'];
+            $current = $locked->estado?->value ?? $locked->estado;
 
             $this->availability->lockResources([$locked->agente_id], $locked->inmueble_id);
 
-            if (($locked->estado?->value ?? $locked->estado) !== $next
+            if ($current !== $next
                 && in_array($next, ['programada', 'confirmada'], true)) {
                 $this->availability->assertNoOverlap(
                     $locked->agente_id,
@@ -30,14 +35,20 @@ final class UpdateEstadoCitaAction
                 );
             }
 
-            if (($locked->estado?->value ?? $locked->estado) !== $next) {
+            if ($current !== $next) {
                 $locked->update(['estado' => $next]);
             }
 
-            return $locked;
+            return [$locked, $current !== 'cancelada' && $next === 'cancelada'];
         });
 
-        return $updated->fresh($this->relations());
+        $updated = $updated->fresh($this->relations());
+
+        if ($cancelled) {
+            $this->notifications->cancelled($updated, $user);
+        }
+
+        return $updated;
     }
 
     private function relations(): array
