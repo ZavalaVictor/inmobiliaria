@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\ClienteAgenteController;
 use App\Http\Controllers\Api\V1\ClienteController;
 use App\Http\Controllers\Api\V1\ClienteInmuebleInteresController;
 use App\Http\Controllers\Api\V1\ConfiguracionRespaldoController;
+use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\DocumentoController;
 use App\Http\Controllers\Api\V1\HistorialCorreoController;
 use App\Http\Controllers\Api\V1\InmuebleController;
@@ -58,6 +59,7 @@ Route::prefix('v1')->group(function (): void {
     });
 
     Route::middleware(['auth:sanctum', 'account.active'])->group(function (): void {
+        Route::get('dashboard', [DashboardController::class, 'index']);
         Route::apiResource('clientes', ClienteController::class);
         Route::apiResource('agentes', AgenteController::class);
         Route::apiResource('categorias', CategoriaController::class);
