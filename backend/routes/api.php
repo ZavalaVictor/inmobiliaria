@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\HistorialCorreoController;
 use App\Http\Controllers\Api\V1\InmuebleController;
 use App\Http\Controllers\Api\V1\InmuebleImagenController;
 use App\Http\Controllers\Api\V1\InteraccionClienteController;
+use App\Http\Controllers\Api\V1\NotificacionController;
 use App\Http\Controllers\Api\V1\OperacionController;
 use App\Http\Controllers\Api\V1\OportunidadController;
 use App\Http\Controllers\Api\V1\OportunidadHistorialController;
@@ -107,6 +108,10 @@ Route::prefix('v1')->group(function (): void {
         Route::get('bitacora', [BitacoraController::class, 'index']);
         Route::get('bitacora/exportar', [BitacoraController::class, 'export']);
         Route::get('bitacora/{registro}', [BitacoraController::class, 'show']);
+        Route::get('notificaciones/no-leidas/count', [NotificacionController::class, 'unreadCount']);
+        Route::patch('notificaciones/leer-todas', [NotificacionController::class, 'markAllAsRead']);
+        Route::get('notificaciones', [NotificacionController::class, 'index']);
+        Route::patch('notificaciones/{notificacion}/leer', [NotificacionController::class, 'markAsRead']);
         Route::get('respaldos', [RespaldoController::class, 'index']);
         Route::post('respaldos', [RespaldoController::class, 'store']);
         Route::get('respaldos/{respaldo}/descargar', [RespaldoController::class, 'download']);
