@@ -152,13 +152,16 @@ class SolicitudesInformacionTest extends TestCase
         ClienteAgente::create(['cliente_id' => $assignedClient->id, 'agente_id' => $agent->agente->id]);
         AgenteInmueble::create(['inmueble_id' => $assignedProperty->id, 'agente_id' => $agent->agente->id]);
 
-        $this->apiGet('/api/v1/solicitudes', $agent)
+        $visibleResponse = $this->apiGet('/api/v1/solicitudes', $agent)
             ->assertOk()
             ->assertJsonCount(3, 'data')
             ->assertJsonFragment(['id' => $attendedOnly->id])
             ->assertJsonFragment(['id' => $clientRequest->id])
-            ->assertJsonFragment(['id' => $propertyRequest->id])
-            ->assertJsonMissing(['id' => $foreignRequest->id]);
+            ->assertJsonFragment(['id' => $propertyRequest->id]);
+        self::assertNotContains(
+            $foreignRequest->id,
+            array_column($visibleResponse->json('data'), 'id'),
+        );
 
         $this->apiPost('/api/v1/solicitudes', $agent, [
             'nombre' => 'Agente no crea',
