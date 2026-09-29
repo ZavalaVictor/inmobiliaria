@@ -12,7 +12,6 @@ final class DashboardRoleResolver
     private const PRECEDENCE = [
         'Administrador',
         'Director General',
-        'Asistente',
         'Agente Inmobiliario',
     ];
 

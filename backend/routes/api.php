@@ -25,6 +25,10 @@ use App\Http\Controllers\Api\V1\OportunidadHistorialController;
 use App\Http\Controllers\Api\V1\PropietarioController;
 use App\Http\Controllers\Api\V1\PublicSolicitudInformacionController;
 use App\Http\Controllers\Api\V1\PublicVisualizacionInmuebleController;
+use App\Http\Controllers\Api\V1\Reportes\ReporteCitasController;
+use App\Http\Controllers\Api\V1\Reportes\ReporteComparativoController;
+use App\Http\Controllers\Api\V1\Reportes\ReporteInmueblesController;
+use App\Http\Controllers\Api\V1\Reportes\ReportePropiedadesConsultadasController;
 use App\Http\Controllers\Api\V1\RespaldoController;
 use App\Http\Controllers\Api\V1\SolicitudInformacionController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -60,6 +64,14 @@ Route::prefix('v1')->group(function (): void {
 
     Route::middleware(['auth:sanctum', 'account.active'])->group(function (): void {
         Route::get('dashboard', [DashboardController::class, 'index']);
+        Route::get('reportes/inmuebles/pdf', [ReporteInmueblesController::class, 'pdf']);
+        Route::get('reportes/inmuebles', [ReporteInmueblesController::class, 'index']);
+        Route::get('reportes/citas/pdf', [ReporteCitasController::class, 'pdf']);
+        Route::get('reportes/citas', [ReporteCitasController::class, 'index']);
+        Route::get('reportes/propiedades-consultadas/pdf', [ReportePropiedadesConsultadasController::class, 'pdf']);
+        Route::get('reportes/propiedades-consultadas', [ReportePropiedadesConsultadasController::class, 'index']);
+        Route::get('reportes/comparativo-periodos/pdf', [ReporteComparativoController::class, 'pdf']);
+        Route::get('reportes/comparativo-periodos', [ReporteComparativoController::class, 'index']);
         Route::apiResource('clientes', ClienteController::class);
         Route::apiResource('agentes', AgenteController::class);
         Route::apiResource('categorias', CategoriaController::class);

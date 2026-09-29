@@ -241,38 +241,10 @@ class DashboardTest extends TestCase
         $this->actingAs($unknown, 'web')->getJson('/api/v1/dashboard')->assertForbidden();
     }
 
-    public function test_assistant_gets_operational_snapshot_without_financial_data(): void
+    public function test_assistant_is_not_authorized_for_strategic_dashboard(): void
     {
         $assistant = $this->user('dashboard-assistant@example.test', 'Asistente');
-        $client = $this->client('dashboard-assistant-client@example.test');
-        $property = $this->property('DASH-ASST');
-        SolicitudInformacion::create(['nombre' => 'Nueva', 'email' => 'new@example.test', 'estado' => 'nueva']);
-        SolicitudInformacion::create(['nombre' => 'Atención', 'email' => 'attention@example.test', 'estado' => 'en_atencion']);
-        Cita::create([
-            'cliente_id' => $client->id,
-            'agente_id' => Agente::create(['user_id' => $this->user('dashboard-assistant-agent@example.test', 'Agente Inmobiliario')->id, 'numero_empleado' => 'DASH-ASST-A'])->id,
-            'inmueble_id' => $property->id,
-            'creado_por_user_id' => $assistant->id,
-            'fecha_inicio' => '2026-09-15 14:00:00',
-            'fecha_fin' => '2026-09-15 15:00:00',
-            'estado' => 'programada',
-        ]);
-        $this->notification($assistant, false);
-
-        $response = $this->actingAs($assistant, 'web')->getJson('/api/v1/dashboard');
-
-        $response->assertOk()
-            ->assertJsonPath('data.rol', 'Asistente')
-            ->assertJsonPath('data.resumen.solicitudes_nuevas', 1)
-            ->assertJsonPath('data.resumen.solicitudes_en_atencion', 1)
-            ->assertJsonPath('data.resumen.citas_hoy', 1)
-            ->assertJsonPath('data.resumen.citas_proximas', 1)
-            ->assertJsonPath('data.resumen.inmuebles_disponibles', 1)
-            ->assertJsonPath('data.resumen.clientes_totales', 1)
-            ->assertJsonPath('data.notificaciones.no_leidas', 1)
-            ->assertJsonPath('data.graficas', [])
-            ->assertJsonMissingPath('data.resumen.monto_operaciones_registradas')
-            ->assertJsonMissingPath('data.resumen.comisiones');
+        $this->actingAs($assistant, 'web')->getJson('/api/v1/dashboard')->assertForbidden();
     }
 
     public function test_director_gets_global_executive_data_without_operational_lists_or_commissions(): void

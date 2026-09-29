@@ -123,7 +123,7 @@ class AuthenticationTest extends TestCase
         $this->spaGet('/api/v1/auth/me')
             ->assertOk()
             ->assertJsonFragment(['clientes.ver'])
-            ->assertJsonFragment(['dashboard.ver']);
+            ->assertJsonMissing(['dashboard.ver']);
     }
 
     public function test_user_can_logout(): void

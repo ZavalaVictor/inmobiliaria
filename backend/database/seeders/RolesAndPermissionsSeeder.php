@@ -161,7 +161,6 @@ class RolesAndPermissionsSeeder extends Seeder
                 'documentos.actualizar',
                 'historial_correos.ver',
                 'dashboard.ver',
-                'reportes.ver',
             ],
             'Asistente' => [
                 'clientes.ver',
@@ -204,7 +203,6 @@ class RolesAndPermissionsSeeder extends Seeder
                 'operaciones.ver',
                 'operaciones.crear',
                 'operaciones.actualizar',
-                'dashboard.ver',
             ],
             'Director General' => [
                 'clientes.ver',
@@ -239,7 +237,6 @@ class RolesAndPermissionsSeeder extends Seeder
                 'solicitudes.ver',
                 'solicitudes.crear',
                 'citas.ver',
-                'dashboard.ver',
             ],
         ];
     }

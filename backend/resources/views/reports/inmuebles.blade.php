@@ -1,0 +1,11 @@
+@extends('reports.layout', ['title' => 'Reporte de Inmuebles'])
+@section('content')
+<h2>Resumen</h2>
+<table><tr><th>Total</th><th>Disponibles</th><th>Vendidos</th><th>Rentados</th><th>Inactivos</th></tr><tr><td>{{ $data['resumen']['total_inmuebles'] }}</td><td>{{ $data['resumen']['estados']['disponibles']['total'] }} ({{ $data['resumen']['estados']['disponibles']['porcentaje'] }}%)</td><td>{{ $data['resumen']['estados']['vendidos']['total'] }} ({{ $data['resumen']['estados']['vendidos']['porcentaje'] }}%)</td><td>{{ $data['resumen']['estados']['rentados']['total'] }} ({{ $data['resumen']['estados']['rentados']['porcentaje'] }}%)</td><td>{{ $data['resumen']['estados']['inactivos']['total'] }} ({{ $data['resumen']['estados']['inactivos']['porcentaje'] }}%)</td></tr></table>
+<h2>Distribución por categoría y zona</h2>
+<table><tr><th>Categoría</th><th>Total</th><th>Zona</th><th>Total</th></tr>@php($max = max(count($data['graficas']['distribucion_por_categoria']), count($data['graficas']['distribucion_por_zona'])))@for($i=0; $i<$max; $i++)<tr><td>{{ $data['graficas']['distribucion_por_categoria'][$i]['categoria'] ?? '' }}</td><td>{{ $data['graficas']['distribucion_por_categoria'][$i]['total'] ?? '' }}</td><td>{{ $data['graficas']['distribucion_por_zona'][$i]['zona'] ?? '' }}</td><td>{{ $data['graficas']['distribucion_por_zona'][$i]['total'] ?? '' }}</td></tr>@endfor</table>
+<h2>Antigüedad disponible</h2><table><tr><th>Rango</th><th>Total</th></tr>@foreach($data['tablas']['antiguedad_disponibles'] as $row)<tr><td>{{ $row['rango'] }}</td><td>{{ $row['total'] }}</td></tr>@endforeach</table>
+<h2>Carga por agente</h2><table><tr><th>Agente</th><th>Inmuebles</th></tr>@foreach($data['graficas']['carga_por_agente'] as $row)<tr><td>{{ $row['agente'] }}</td><td>{{ $row['total_inmuebles'] }}</td></tr>@endforeach</table>
+<h2>Disponibles más antiguos</h2><table><tr><th>Código</th><th>Título</th><th>Zona</th><th>Días</th><th>Agente principal</th></tr>@foreach($data['tablas']['inmuebles_disponibles_mas_antiguos'] as $row)<tr><td>{{ $row['codigo'] }}</td><td>{{ $row['titulo'] }}</td><td>{{ $row['zona'] }}</td><td>{{ $row['dias_disponible'] }}</td><td>{{ $row['agente_principal'] ?? '—' }}</td></tr>@endforeach</table>
+@if($data['resumen']['total_inmuebles'] === 0)<p class="muted">Sin datos para los filtros seleccionados.</p>@endif
+@endsection

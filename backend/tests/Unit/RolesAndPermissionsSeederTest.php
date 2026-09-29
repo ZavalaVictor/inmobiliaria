@@ -92,7 +92,9 @@ class RolesAndPermissionsSeederTest extends TestCase
         self::assertContains('dashboard.ver', $assignments['Director General']);
         self::assertContains('reportes.ver', $assignments['Director General']);
         self::assertContains('reportes.exportar', $assignments['Director General']);
-        self::assertContains('dashboard.ver', $assignments['Cliente']);
+        self::assertNotContains('dashboard.ver', $assignments['Asistente']);
+        self::assertNotContains('dashboard.ver', $assignments['Cliente']);
+        self::assertNotContains('reportes.ver', $assignments['Agente Inmobiliario']);
         self::assertNotContains('reportes.ver', $assignments['Cliente']);
     }
 
