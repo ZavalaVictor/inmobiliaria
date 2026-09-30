@@ -6,7 +6,11 @@ import { NewPasswordPage } from '../pages/auth/NewPasswordPage.tsx'
 import { PasswordRecoveryPage } from '../pages/auth/PasswordRecoveryPage.tsx'
 import { PasswordUpdatedPage } from '../pages/auth/PasswordUpdatedPage.tsx'
 import { ReviewEmailPage } from '../pages/auth/ReviewEmailPage.tsx'
-import { PrivateAreaPage } from '../pages/private/PrivateAreaPage.tsx'
+import { DashboardPage } from '../pages/dashboard/DashboardPage.tsx'
+import { ForbiddenPage } from '../pages/errors/ForbiddenPage.tsx'
+import { NotFoundPage } from '../pages/errors/NotFoundPage.tsx'
+import { PortalPlaceholderPage } from '../pages/private/PortalPlaceholderPage.tsx'
+import { WorkspacePage } from '../pages/private/WorkspacePage.tsx'
 import { getInitialRoute, navigate } from './navigation.ts'
 
 function usePathname(): string {
@@ -40,8 +44,14 @@ function SessionUnavailable(): React.JSX.Element {
   )
 }
 
-function ProtectedRoute({ children }: PropsWithChildren): React.JSX.Element {
-  const { status } = useAuth()
+interface AccessRouteProps extends PropsWithChildren {
+  permission?: string
+  roles?: string[]
+  exactRole?: string
+}
+
+function AccessRoute({ children, exactRole, permission, roles }: AccessRouteProps): React.JSX.Element {
+  const { can, status, user } = useAuth()
 
   if (status === 'loading') {
     return <ScreenLoader />
@@ -51,8 +61,16 @@ function ProtectedRoute({ children }: PropsWithChildren): React.JSX.Element {
     return <SessionUnavailable />
   }
 
-  if (status === 'unauthenticated') {
+  if (status === 'unauthenticated' || !user) {
     return <Redirect to="/login" />
+  }
+
+  const roleAllowed = roles ? roles.some((role) => user.roles.includes(role)) : true
+  const exactRoleAllowed = exactRole ? user.roles.length === 1 && user.roles[0] === exactRole : true
+  const permissionAllowed = permission ? can(permission) : true
+
+  if (!roleAllowed || !exactRoleAllowed || !permissionAllowed) {
+    return <ForbiddenPage />
   }
 
   return <>{children}</>
@@ -115,16 +133,24 @@ export function AppRouter(): React.JSX.Element {
   }
 
   if (pathname === '/dashboard') {
-    return <ProtectedRoute><PrivateAreaPage kind="admin" /></ProtectedRoute>
+    return <AccessRoute permission="dashboard.ver" roles={['Administrador', 'Agente Inmobiliario', 'Director General']}><DashboardPage /></AccessRoute>
   }
 
   if (pathname === '/workspace') {
-    return <ProtectedRoute><PrivateAreaPage kind="internal" /></ProtectedRoute>
+    return <AccessRoute roles={['Administrador', 'Agente Inmobiliario', 'Asistente', 'Director General']}><WorkspacePage /></AccessRoute>
   }
 
   if (pathname === '/portal-cliente') {
-    return <ProtectedRoute><PrivateAreaPage kind="client" /></ProtectedRoute>
+    return <AccessRoute exactRole="Cliente" permission="portal_cliente.ver" roles={['Cliente']}><PortalPlaceholderPage /></AccessRoute>
   }
 
-  return <Redirect to={user ? getInitialRoute(user) : '/login'} />
+  if (status === 'loading') {
+    return <ScreenLoader />
+  }
+
+  if (status === 'unavailable') {
+    return <SessionUnavailable />
+  }
+
+  return <NotFoundPage />
 }
