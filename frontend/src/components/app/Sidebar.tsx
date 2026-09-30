@@ -29,17 +29,19 @@ export function Sidebar({ mobile = false, onNavigate }: SidebarProps): React.JSX
   }
 
   return (
-    <aside aria-label="Navegación principal" className={`${mobile ? 'flex h-full w-[min(84vw,320px)]' : 'hidden lg:flex lg:min-h-screen lg:w-64'} app-sidebar shrink-0 flex-col`}>
-      <div className="border-b border-white/10 px-6 py-6">
-        <BrandLogo compact variant="light" />
-        <p className="mt-2 text-[11px] font-medium tracking-[0.08em] text-white/50">Gestión inmobiliaria</p>
+    <aside aria-label="Navegación principal" className={`${mobile ? 'flex h-full w-[min(84vw,320px)]' : 'hidden md:sticky md:top-0 md:flex md:h-screen md:max-h-screen md:w-64 md:overflow-hidden'} app-sidebar shrink-0 flex-col`}>
+      <div className="app-sidebar-brand border-b border-white/10 px-5 py-6 lg:px-6">
+        <div className="app-sidebar-brand-logo">
+          <BrandLogo compact variant="light" />
+          <p className="app-sidebar-brand-subtitle">Gestión Inmobiliaria</p>
+        </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <nav aria-label="Secciones de la aplicación" className="space-y-6 px-4 py-6">
+        <nav aria-label="Secciones de la aplicación" className="space-y-5 px-3 py-5 lg:px-4 lg:py-6">
           {sections.map((section) => (
             <section key={section.label ?? 'sin-seccion'}>
-              {section.label ? <h2 className="px-3 pb-2 text-[10px] font-bold tracking-[0.18em] text-white/45">{section.label}</h2> : null}
-              <div className="space-y-1">
+              {section.label ? <h2 className="px-3 pb-2 text-[10px] font-semibold tracking-[0.14em] text-white/45">{section.label}</h2> : null}
+              <div className="space-y-0.5">
                 {section.items.map((item) => {
                   const Icon = item.icon
                   const active = isNavigationItemActive(item)
@@ -51,12 +53,12 @@ export function Sidebar({ mobile = false, onNavigate }: SidebarProps): React.JSX
           ))}
         </nav>
       </div>
-      {user ? <div className="border-t border-white/10 px-4 py-4">
+      {user ? <div className="border-t border-white/10 px-3 py-4 lg:px-4">
         <div className="flex items-center gap-3 rounded-xl px-2 py-2">
-          <div aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-[var(--app-accent)] text-xs font-bold text-white">{getInitials(user.nombres, user.apellidos)}</div>
+          <div aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full bg-[#e7eef8] text-xs font-bold text-[#142b49] shadow-sm">{getInitials(user.nombres, user.apellidos)}</div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">{user.nombres} {user.apellidos}</p>
-            <p className="truncate text-xs text-white/55">{getPrimaryRole(user.roles)}</p>
+            <p className="truncate text-[13px] font-semibold text-white">{user.nombres} {user.apellidos}</p>
+            <p className="truncate text-[11px] text-white/55">{getPrimaryRole(user.roles)}</p>
           </div>
         </div>
       </div> : null}

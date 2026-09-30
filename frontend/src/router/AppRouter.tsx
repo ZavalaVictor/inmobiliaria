@@ -11,6 +11,7 @@ import { ForbiddenPage } from '../pages/errors/ForbiddenPage.tsx'
 import { NotFoundPage } from '../pages/errors/NotFoundPage.tsx'
 import { PortalPlaceholderPage } from '../pages/private/PortalPlaceholderPage.tsx'
 import { WorkspacePage } from '../pages/private/WorkspacePage.tsx'
+import { AppShell } from '../components/app/AppShell.tsx'
 import { getInitialRoute, navigate } from './navigation.ts'
 
 function usePathname(): string {
@@ -90,6 +91,10 @@ function GuestRoute({ children }: PropsWithChildren): React.JSX.Element {
   return <>{children}</>
 }
 
+function InternalShell({ children }: PropsWithChildren): React.JSX.Element {
+  return <AppShell>{children}</AppShell>
+}
+
 export function AppRouter(): React.JSX.Element {
   const pathname = usePathname()
   const { clearNotice, status, user } = useAuth()
@@ -133,11 +138,11 @@ export function AppRouter(): React.JSX.Element {
   }
 
   if (pathname === '/dashboard') {
-    return <AccessRoute permission="dashboard.ver" roles={['Administrador', 'Agente Inmobiliario', 'Director General']}><DashboardPage /></AccessRoute>
+    return <AccessRoute permission="dashboard.ver" roles={['Administrador', 'Agente Inmobiliario', 'Director General']}><InternalShell><DashboardPage /></InternalShell></AccessRoute>
   }
 
   if (pathname === '/workspace') {
-    return <AccessRoute roles={['Administrador', 'Agente Inmobiliario', 'Asistente', 'Director General']}><WorkspacePage /></AccessRoute>
+    return <AccessRoute roles={['Administrador', 'Agente Inmobiliario', 'Asistente', 'Director General']}><InternalShell><WorkspacePage /></InternalShell></AccessRoute>
   }
 
   if (pathname === '/portal-cliente') {

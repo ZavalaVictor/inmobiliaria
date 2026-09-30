@@ -63,7 +63,33 @@ input {
 }
 
 .app-sidebar {
-  background: var(--app-sidebar, #0b294d);
+  background: linear-gradient(180deg, #10243b 0%, #0b1c2f 100%);
+  border-color: rgb(255 255 255 / 8%);
+}
+
+.app-sidebar-brand-logo > div {
+  gap: 0.35rem;
+}
+
+.app-sidebar-brand-logo > div > img {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.app-sidebar-brand-logo > div > span {
+  font-size: 1.55rem;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.app-sidebar-brand-subtitle {
+  margin: 0.25rem 0 0 3.85rem;
+  color: rgb(255 255 255 / 55%);
+  font-size: 0.65rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 .app-sidebar-link {
@@ -72,7 +98,8 @@ input {
   align-items: center;
   gap: 0.75rem;
   border-radius: 0.75rem;
-  padding: 0.75rem;
+  min-height: 2.5rem;
+  padding: 0.625rem 0.75rem;
   color: rgb(255 255 255 / 72%);
   font-size: 0.875rem;
   font-weight: 600;
@@ -87,9 +114,9 @@ input {
 }
 
 .app-sidebar-link-active {
-  background: rgb(84 197 185 / 18%);
+  background: #0f766e;
   color: #ffffff;
-  box-shadow: inset 3px 0 0 var(--app-accent);
+  box-shadow: 0 8px 18px rgb(6 78 76 / 18%);
 }
 
 .app-topbar {
@@ -116,6 +143,16 @@ input {
   border-color: var(--app-accent);
   background: var(--app-accent-soft);
   color: var(--app-accent);
+}
+
+.app-menu-toggle {
+  display: inline-flex;
+}
+
+@media (min-width: 48rem) {
+  .app-menu-toggle {
+    display: none;
+  }
 }
 
 .app-user-button {
