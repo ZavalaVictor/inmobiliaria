@@ -19,4 +19,5 @@ enum TipoCorreo: string
     case OperacionCreada = 'operacion_creada';
     case OperacionCierre = 'operacion_cierre';
     case DocumentoCargado = 'documento_cargado';
+    case PortalClienteActivacion = 'portal_cliente_activacion';
 }

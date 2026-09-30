@@ -80,6 +80,7 @@ final class DomainEnumsTest extends TestCase
                 'operacion_creada',
                 'operacion_cierre',
                 'documento_cargado',
+                'portal_cliente_activacion',
             ],
             EstadoCorreo::class => ['pendiente', 'enviado', 'fallido'],
             FrecuenciaRespaldo::class => ['diario', 'semanal', 'mensual'],

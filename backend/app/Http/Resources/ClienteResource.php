@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\EstadoCliente;
+use App\Enums\EstadoUsuario;
 use App\Enums\TipoInteresCliente;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -41,6 +42,16 @@ class ClienteResource extends JsonResource
                     'email' => $this->user->email,
                 ];
             }),
+            'portal' => $this->when(
+                $request->user()?->hasRole('Administrador') && $request->user()->can('clientes.portal.gestionar'),
+                function (): array {
+                    return [
+                        'configurado' => $this->user_id !== null,
+                        'habilitado' => $this->user !== null && $this->user->estado === EstadoUsuario::Activo,
+                        'user_id' => $this->user_id,
+                    ];
+                }
+            ),
             'agentes' => $this->whenLoaded('agentes', function (): array {
                 return $this->agentes->map(static fn ($agente): array => [
                     'id' => $agente->id,

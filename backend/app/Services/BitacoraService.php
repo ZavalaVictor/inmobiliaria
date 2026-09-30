@@ -40,6 +40,8 @@ class BitacoraService
         'configuracion_respaldo_actualizada',
         'restauracion_completada',
         'restauracion_fallida',
+        'cliente_portal_habilitado',
+        'cliente_portal_deshabilitado',
     ];
 
     public const ENTITIES = [
@@ -52,6 +54,7 @@ class BitacoraService
         'operacion_agente',
         'respaldo',
         'configuracion_respaldo',
+        'cliente',
     ];
 
     private const SENSITIVE_KEYS = [

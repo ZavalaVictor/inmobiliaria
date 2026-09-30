@@ -28,7 +28,7 @@ class ClienteController extends Controller
         $query = (new ClienteIndexQuery($request->validated()))->apply($query);
         $perPage = (int) ($request->validated('per_page') ?? 15);
 
-        return ClienteResource::collection($query->paginate($perPage)->withQueryString());
+        return ClienteResource::collection($query->with('user:id,estado')->paginate($perPage)->withQueryString());
     }
 
     public function store(CreateClienteRequest $request, CreateClienteAction $action): JsonResponse

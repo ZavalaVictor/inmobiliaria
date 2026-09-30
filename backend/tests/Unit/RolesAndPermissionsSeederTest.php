@@ -32,8 +32,8 @@ class RolesAndPermissionsSeederTest extends TestCase
     public function test_permission_catalog_uses_the_web_guard_and_has_expected_size(): void
     {
         self::assertSame('web', $this->seeder->guardName());
-        self::assertCount(87, $this->seeder->permissionNames());
-        self::assertCount(87, array_unique($this->seeder->permissionNames()));
+        self::assertCount(89, $this->seeder->permissionNames());
+        self::assertCount(89, array_unique($this->seeder->permissionNames()));
         self::assertNotContains('permisos.crear', $this->seeder->permissionNames());
         self::assertNotContains('permisos.actualizar', $this->seeder->permissionNames());
         self::assertNotContains('permisos.eliminar', $this->seeder->permissionNames());
@@ -43,7 +43,10 @@ class RolesAndPermissionsSeederTest extends TestCase
     {
         $assignments = $this->seeder->rolePermissions();
 
-        self::assertSame($this->seeder->permissionNames(), $assignments['Administrador']);
+        self::assertSame(
+            array_values(array_diff($this->seeder->permissionNames(), ['portal_cliente.ver'])),
+            $assignments['Administrador']
+        );
     }
 
     public function test_final_role_restrictions_are_present(): void
@@ -82,6 +85,14 @@ class RolesAndPermissionsSeederTest extends TestCase
         self::assertSame(
             ['Administrador'],
             $this->rolesWithPermission($assignments, 'bitacora.ver')
+        );
+        self::assertSame(
+            ['Administrador'],
+            $this->rolesWithPermission($assignments, 'clientes.portal.gestionar')
+        );
+        self::assertSame(
+            ['Cliente'],
+            $this->rolesWithPermission($assignments, 'portal_cliente.ver')
         );
     }
 

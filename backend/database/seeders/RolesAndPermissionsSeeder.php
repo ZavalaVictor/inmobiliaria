@@ -43,6 +43,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'clientes.crear',
             'clientes.actualizar',
             'clientes.eliminar',
+            'clientes.portal.gestionar',
             'agentes.ver',
             'agentes.crear',
             'agentes.actualizar',
@@ -115,6 +116,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'dashboard.ver',
             'reportes.ver',
             'reportes.exportar',
+            'portal_cliente.ver',
         ];
     }
 
@@ -123,7 +125,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $allPermissions = $this->permissionNames();
 
         return [
-            'Administrador' => $allPermissions,
+            'Administrador' => array_values(array_diff($allPermissions, ['portal_cliente.ver'])),
             'Agente Inmobiliario' => [
                 'clientes.ver',
                 'clientes.crear',
@@ -237,6 +239,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'solicitudes.ver',
                 'solicitudes.crear',
                 'citas.ver',
+                'portal_cliente.ver',
             ],
         ];
     }
