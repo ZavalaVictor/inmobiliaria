@@ -466,6 +466,50 @@ class SolicitudesInformacionTest extends TestCase
         ])->assertStatus(429);
     }
 
+    public function test_admin_can_convert_request_to_prospect_client_without_duplicates(): void
+    {
+        $admin = $this->user('admin-convert-request@example.test', 'Administrador');
+        $property = $this->property('convert-request');
+        $solicitud = SolicitudInformacion::create([
+            'inmueble_id' => $property->id,
+            'nombre' => 'María Elena López',
+            'email' => 'maria.convert@example.test',
+            'telefono' => '5551234567',
+            'mensaje' => 'Me interesa visitar la propiedad.',
+        ]);
+
+        $first = $this->apiPost('/api/v1/solicitudes/'.$solicitud->id.'/convertir-cliente', $admin, [])
+            ->assertOk()
+            ->assertJsonPath('data.creado', true)
+            ->assertJsonPath('data.cliente.email', 'maria.convert@example.test');
+
+        $clientId = $first->json('data.cliente.id');
+        self::assertDatabaseHas('clientes', [
+            'id' => $clientId,
+            'nombres' => 'María',
+            'apellido_paterno' => 'Elena',
+            'apellido_materno' => 'López',
+            'estado_cliente' => 'prospecto',
+        ]);
+        self::assertDatabaseHas('solicitudes_informacion', [
+            'id' => $solicitud->id,
+            'cliente_id' => $clientId,
+        ]);
+        self::assertDatabaseHas('cliente_inmueble_intereses', [
+            'cliente_id' => $clientId,
+            'inmueble_id' => $property->id,
+            'estado' => 'activo',
+        ]);
+
+        $this->apiPost('/api/v1/solicitudes/'.$solicitud->id.'/convertir-cliente', $admin, [])
+            ->assertOk()
+            ->assertJsonPath('data.creado', false)
+            ->assertJsonPath('data.cliente.id', $clientId);
+
+        self::assertSame(1, Cliente::query()->where('email', 'maria.convert@example.test')->count());
+        self::assertSame(1, ClienteInmuebleInteres::query()->where('cliente_id', $clientId)->where('inmueble_id', $property->id)->count());
+    }
+
     private function user(string $email, string $role): User
     {
         $user = User::create([

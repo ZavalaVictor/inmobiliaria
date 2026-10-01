@@ -53,6 +53,10 @@ return new class extends Migration
         }, $images);
 
         foreach ($rows as $row) {
+            if (! DB::table('inmuebles')->where('id', $row['inmueble_id'])->exists()) {
+                continue;
+            }
+
             $exists = DB::table('inmueble_imagenes')
                 ->where('firebase_path', $row['firebase_path'])
                 ->exists();

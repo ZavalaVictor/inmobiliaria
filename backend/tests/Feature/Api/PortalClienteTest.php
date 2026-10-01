@@ -17,6 +17,7 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
+use Carbon\CarbonImmutable;
 use Tests\TestCase;
 
 class PortalClienteTest extends TestCase
@@ -148,13 +149,14 @@ class PortalClienteTest extends TestCase
         ]);
         $agentUser = $this->user('agent-'.$suffix.'@example.test', 'Agente Inmobiliario');
         $agent = Agente::create(['user_id' => $agentUser->id, 'numero_empleado' => 'PORTAL-'.$suffix]);
+        $upcomingStart = CarbonImmutable::now(config('app.timezone'))->addDay()->setTime(10, 0);
         $appointment = Cita::create([
             'cliente_id' => $client->id,
             'agente_id' => $agent->id,
             'inmueble_id' => $property->id,
             'creado_por_user_id' => $agentUser->id,
-            'fecha_inicio' => '2026-10-01 10:00:00',
-            'fecha_fin' => '2026-10-01 11:00:00',
+            'fecha_inicio' => $upcomingStart,
+            'fecha_fin' => $upcomingStart->addHour(),
             'estado' => 'confirmada',
         ]);
 

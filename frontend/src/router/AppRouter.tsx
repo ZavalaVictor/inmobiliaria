@@ -13,6 +13,8 @@ import { InmueblesPage } from '../pages/inmuebles/InmueblesPage.tsx'
 import { InmuebleDetailPage } from '../pages/inmuebles/InmuebleDetailPage.tsx'
 import { InmuebleFormPage } from '../pages/inmuebles/InmuebleFormPage.tsx'
 import { PropietariosPage } from '../pages/propietarios/PropietariosPage.tsx'
+import { SolicitudDetailPage } from '../pages/solicitudes/SolicitudDetailPage.tsx'
+import { SolicitudesPage } from '../pages/solicitudes/SolicitudesPage.tsx'
 import { PropiedadesPage } from '../pages/public/PropiedadesPage.tsx'
 import { PortalPlaceholderPage } from '../pages/private/PortalPlaceholderPage.tsx'
 import { WorkspacePage } from '../pages/private/WorkspacePage.tsx'
@@ -170,6 +172,15 @@ export function AppRouter(): React.JSX.Element {
 
   if (pathname === '/propietarios') {
     return <AccessRoute permission="propietarios.ver" roles={['Administrador', 'Agente Inmobiliario', 'Asistente', 'Director General']}><InternalShell><PropietariosPage /></InternalShell></AccessRoute>
+  }
+
+  const requestDetailMatch = pathname.match(/^\/solicitudes\/(\d+)$/)
+  if (requestDetailMatch) {
+    return <AccessRoute permission="solicitudes.ver" roles={['Administrador', 'Agente Inmobiliario', 'Asistente', 'Director General']}><InternalShell><SolicitudDetailPage id={Number(requestDetailMatch[1])} key={requestDetailMatch[1]} /></InternalShell></AccessRoute>
+  }
+
+  if (pathname === '/solicitudes') {
+    return <AccessRoute permission="solicitudes.ver" roles={['Administrador', 'Agente Inmobiliario', 'Asistente', 'Director General']}><InternalShell><SolicitudesPage /></InternalShell></AccessRoute>
   }
 
   if (pathname === '/workspace') {

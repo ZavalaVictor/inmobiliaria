@@ -119,6 +119,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('solicitudes', [SolicitudInformacionController::class, 'store']);
         Route::get('solicitudes/{solicitud}', [SolicitudInformacionController::class, 'show']);
         Route::patch('solicitudes/{solicitud}', [SolicitudInformacionController::class, 'update']);
+        Route::post('solicitudes/{solicitud}/convertir-cliente', [SolicitudInformacionController::class, 'convertToClient']);
         Route::delete('solicitudes/{solicitud}', [SolicitudInformacionController::class, 'destroy']);
         Route::get('documentos', [DocumentoController::class, 'index']);
         Route::post('documentos', [DocumentoController::class, 'store']);

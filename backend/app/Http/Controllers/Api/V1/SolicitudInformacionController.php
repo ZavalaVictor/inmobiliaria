@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Solicitudes\CreateSolicitudInformacionAction;
+use App\Actions\Solicitudes\ConvertSolicitudInformacionToClienteAction;
 use App\Actions\Solicitudes\DeleteSolicitudInformacionAction;
 use App\Actions\Solicitudes\UpdateSolicitudInformacionAction;
 use App\Http\Controllers\Controller;
@@ -10,6 +11,7 @@ use App\Http\Requests\SolicitudInformacion\CreateSolicitudInformacionRequest;
 use App\Http\Requests\SolicitudInformacion\IndexSolicitudInformacionRequest;
 use App\Http\Requests\SolicitudInformacion\UpdateSolicitudInformacionRequest;
 use App\Http\Resources\SolicitudInformacionResource;
+use App\Http\Resources\ClienteResource;
 use App\Models\SolicitudInformacion;
 use App\Queries\Solicitudes\SolicitudIndexQuery;
 use App\Queries\Visibility\VisibleSolicitudesQuery;
@@ -73,6 +75,23 @@ class SolicitudInformacionController extends Controller
         return new SolicitudInformacionResource(
             $action->execute($request->user(), $solicitud, $request->validated())
         );
+    }
+
+    public function convertToClient(
+        SolicitudInformacion $solicitud,
+        ConvertSolicitudInformacionToClienteAction $action,
+    ): JsonResponse {
+        Gate::authorize('update', $solicitud);
+        Gate::authorize('create', \App\Models\Cliente::class);
+
+        $result = $action->execute($solicitud);
+
+        return response()->json([
+            'data' => [
+                'cliente' => (new ClienteResource($result['cliente']))->resolve(),
+                'creado' => $result['creado'],
+            ],
+        ]);
     }
 
     public function destroy(
