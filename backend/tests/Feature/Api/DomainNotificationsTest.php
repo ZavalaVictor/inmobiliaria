@@ -69,8 +69,14 @@ class DomainNotificationsTest extends TestCase
             'email' => 'public-request@example.test',
         ]);
 
-        self::assertSame(1, DB::table('notifications')->count());
-        $publicHistory = HistorialCorreo::query()->where('relacionado_id', $public->id)->firstOrFail();
+        self::assertSame(3, DB::table('notifications')->count());
+        self::assertSame(3, HistorialCorreo::query()->where('relacionado_id', $public->id)->count());
+        self::assertSame(1, HistorialCorreo::query()->where('relacionado_id', $public->id)->where('destinatario_user_id', $admin->id)->count());
+        self::assertSame(1, HistorialCorreo::query()->where('relacionado_id', $public->id)->where('destinatario_user_id', $assistant->id)->count());
+        $publicHistory = HistorialCorreo::query()
+            ->where('relacionado_id', $public->id)
+            ->where('destinatario_email', 'public-request@example.test')
+            ->firstOrFail();
         self::assertNull($publicHistory->destinatario_user_id);
         self::assertSame('enviado', $publicHistory->estado->value);
     }

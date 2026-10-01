@@ -10,7 +10,15 @@ composer install
 cp .env.example .env
 php artisan key:generate
 php artisan test
-php artisan serve
+composer run dev
+```
+
+El servidor de desarrollo aplica límites de subida de 10 MB por imagen y 12 MB
+por solicitud. Tanto `composer run dev` como `php artisan serve` aplican estos
+límites automáticamente:
+
+```bash
+php artisan serve --host=127.0.0.1 --port=8000
 ```
 
 La verificación funcional está disponible en `GET /api/health`.

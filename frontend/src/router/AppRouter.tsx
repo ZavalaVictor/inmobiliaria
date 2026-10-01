@@ -9,6 +9,11 @@ import { ReviewEmailPage } from '../pages/auth/ReviewEmailPage.tsx'
 import { DashboardPage } from '../pages/dashboard/DashboardPage.tsx'
 import { ForbiddenPage } from '../pages/errors/ForbiddenPage.tsx'
 import { NotFoundPage } from '../pages/errors/NotFoundPage.tsx'
+import { InmueblesPage } from '../pages/inmuebles/InmueblesPage.tsx'
+import { InmuebleDetailPage } from '../pages/inmuebles/InmuebleDetailPage.tsx'
+import { InmuebleFormPage } from '../pages/inmuebles/InmuebleFormPage.tsx'
+import { PropietariosPage } from '../pages/propietarios/PropietariosPage.tsx'
+import { PropiedadesPage } from '../pages/public/PropiedadesPage.tsx'
 import { PortalPlaceholderPage } from '../pages/private/PortalPlaceholderPage.tsx'
 import { WorkspacePage } from '../pages/private/WorkspacePage.tsx'
 import { AppShell } from '../components/app/AppShell.tsx'
@@ -137,8 +142,34 @@ export function AppRouter(): React.JSX.Element {
     return <PasswordUpdatedPage />
   }
 
+  if (pathname === '/propiedades') {
+    return <PropiedadesPage />
+  }
+
   if (pathname === '/dashboard') {
     return <AccessRoute permission="dashboard.ver" roles={['Administrador', 'Agente Inmobiliario', 'Director General']}><InternalShell><DashboardPage /></InternalShell></AccessRoute>
+  }
+
+  const propertyEditMatch = pathname.match(/^\/inmuebles\/(\d+)\/editar$/)
+  if (propertyEditMatch) {
+    return <AccessRoute permission="inmuebles.actualizar" roles={['Administrador', 'Agente Inmobiliario', 'Director General']}><InternalShell><InmuebleFormPage id={Number(propertyEditMatch[1])} /></InternalShell></AccessRoute>
+  }
+
+  if (pathname === '/inmuebles/nuevo') {
+    return <AccessRoute permission="inmuebles.crear" roles={['Administrador', 'Director General']}><InternalShell><InmuebleFormPage /></InternalShell></AccessRoute>
+  }
+
+  const propertyDetailMatch = pathname.match(/^\/inmuebles\/(\d+)$/)
+  if (propertyDetailMatch) {
+    return <AccessRoute permission="inmuebles.ver" roles={['Administrador', 'Agente Inmobiliario', 'Asistente', 'Director General']}><InternalShell><InmuebleDetailPage id={Number(propertyDetailMatch[1])} /></InternalShell></AccessRoute>
+  }
+
+  if (pathname === '/inmuebles') {
+    return <AccessRoute permission="inmuebles.ver" roles={['Administrador', 'Agente Inmobiliario', 'Asistente', 'Director General']}><InternalShell><InmueblesPage /></InternalShell></AccessRoute>
+  }
+
+  if (pathname === '/propietarios') {
+    return <AccessRoute permission="propietarios.ver" roles={['Administrador', 'Agente Inmobiliario', 'Asistente', 'Director General']}><InternalShell><PropietariosPage /></InternalShell></AccessRoute>
   }
 
   if (pathname === '/workspace') {

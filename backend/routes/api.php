@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\V1\OportunidadController;
 use App\Http\Controllers\Api\V1\OportunidadHistorialController;
 use App\Http\Controllers\Api\V1\PortalClienteController;
 use App\Http\Controllers\Api\V1\PropietarioController;
+use App\Http\Controllers\Api\V1\PublicInmuebleController;
 use App\Http\Controllers\Api\V1\PublicSolicitudInformacionController;
 use App\Http\Controllers\Api\V1\PublicVisualizacionInmuebleController;
 use App\Http\Controllers\Api\V1\Reportes\ReporteCitasController;
@@ -47,6 +48,10 @@ Route::get('/health', function () {
 Route::prefix('v1')->group(function (): void {
     Route::post('public/solicitudes', [PublicSolicitudInformacionController::class, 'store'])
         ->middleware('throttle:10,1');
+    Route::get('public/inmuebles', [PublicInmuebleController::class, 'index'])
+        ->middleware('throttle:60,1');
+    Route::get('public/inmuebles/{inmueble:slug}', [PublicInmuebleController::class, 'show'])
+        ->middleware('throttle:60,1');
     Route::post('public/inmuebles/{inmueble}/visualizaciones', [PublicVisualizacionInmuebleController::class, 'store'])
         ->middleware('throttle:60,1');
 

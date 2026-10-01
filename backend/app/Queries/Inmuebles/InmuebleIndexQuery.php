@@ -21,7 +21,10 @@ final class InmuebleIndexQuery
 
         $sort = $this->filters['sort'] ?? 'created_at';
         $direction = $this->filters['direction'] ?? 'desc';
-        $relations = ['categoria:id,nombre'];
+        $relations = [
+            'categoria:id,nombre',
+            'imagenPrincipal:id,inmueble_id,url_publica,nombre_original,mime_type,tamano_bytes,es_principal,orden,texto_alternativo,created_at,updated_at',
+        ];
 
         if ($this->includeOwner) {
             $relations[] = 'propietario:id,nombre_razon_social';

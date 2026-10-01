@@ -55,6 +55,12 @@ class InmuebleResource extends JsonResource
                     'nombre' => $this->categoria->nombre,
                 ];
             }),
+            'imagen_principal' => $this->when(
+                $this->relationLoaded('imagenPrincipal'),
+                fn (): ?array => $this->imagenPrincipal === null
+                    ? null
+                    : (new InmuebleImagenResource($this->imagenPrincipal))->toArray($request),
+            ),
             'imagenes' => InmuebleImagenResource::collection($this->whenLoaded('imagenes')),
         ];
 

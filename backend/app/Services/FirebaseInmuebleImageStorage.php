@@ -24,7 +24,11 @@ class FirebaseInmuebleImageStorage implements InmuebleImageStorage
 
     public function upload(UploadedFile $file, string $path, string $mimeType): ?string
     {
-        $stream = fopen($file->getRealPath(), 'rb');
+        $stream = fopen($file->getPathname(), 'rb');
+
+        if ($stream === false) {
+            throw new \RuntimeException('Unable to open uploaded image stream.');
+        }
 
         try {
             $this->bucket()->upload(
@@ -38,7 +42,9 @@ class FirebaseInmuebleImageStorage implements InmuebleImageStorage
                 ]
             );
         } finally {
-            fclose($stream);
+            if (is_resource($stream) && get_resource_type($stream) !== 'Unknown') {
+                fclose($stream);
+            }
         }
 
         return $this->publicUrl($path);

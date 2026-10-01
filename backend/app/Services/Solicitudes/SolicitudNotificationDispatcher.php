@@ -55,6 +55,8 @@ final class SolicitudNotificationDispatcher
 
     public function publicCreated(SolicitudInformacion $solicitud): void
     {
+        $this->created($solicitud);
+
         $this->correo->queue(
             $solicitud->email,
             null,

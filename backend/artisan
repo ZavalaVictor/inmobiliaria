@@ -6,6 +6,17 @@ use Symfony\Component\Console\Input\ArgvInput;
 
 define('LARAVEL_START', microtime(true));
 
+// The CLI server does not load public/.user.ini, so ensure the PHP process
+// created by `php artisan serve` accepts the same image upload size as the
+// application validation rules.
+if (($argv[1] ?? null) === 'serve') {
+    $uploadAwarePhp = __DIR__.'/bin/php-upload-server';
+
+    if (is_executable($uploadAwarePhp)) {
+        putenv('PHP_BINARY='.$uploadAwarePhp);
+    }
+}
+
 // Register the Composer autoloader...
 require __DIR__.'/vendor/autoload.php';
 

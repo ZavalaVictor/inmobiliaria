@@ -52,7 +52,7 @@ npm run build
 En terminales separadas:
 
 ```bash
-cd backend && php artisan serve
+cd backend && composer run dev
 cd frontend && npm run dev
 ```
 

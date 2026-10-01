@@ -56,14 +56,14 @@ export function getNavigationSections(user: AuthUser | null, can: (permission: s
       label: 'CRM',
       items: [
         { label: 'Clientes', href: '/clientes', icon: UsersIcon, enabled: false, permission: 'clientes.ver', roles: internalRoles },
-        { label: 'Propietarios', href: '/propietarios', icon: OwnerIcon, enabled: false, permission: 'propietarios.ver', roles: internalRoles },
+        { label: 'Propietarios', href: '/propietarios', icon: OwnerIcon, enabled: true, permission: 'propietarios.ver', roles: internalRoles },
         { label: 'Solicitudes', href: '/solicitudes', icon: RequestIcon, enabled: false, permission: 'solicitudes.ver', roles: internalRoles },
       ],
     },
     {
       label: 'INMUEBLES',
       items: [
-        { label: 'Inmuebles', href: '/inmuebles', icon: PropertyIcon, enabled: false, permission: 'inmuebles.ver', roles: internalRoles },
+        { label: 'Inmuebles', href: '/inmuebles', icon: PropertyIcon, enabled: true, permission: 'inmuebles.ver', roles: internalRoles },
         { label: 'Mapa', href: '/inmuebles/mapa', icon: MapIcon, enabled: false, permission: 'inmuebles.ver', roles: internalRoles },
       ],
     },

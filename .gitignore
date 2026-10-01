@@ -30,14 +30,22 @@ backend/database/*.sqlite
 
 # Node / Vite
 frontend/node_modules/
+frontend-public/node_modules/
 frontend/dist/
 frontend/dist-ssr/
+frontend-public/dist/
 frontend/.vite/
+frontend-public/.vite/
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
 frontend/pnpm-debug.log*
 frontend/*.local
+frontend-public/npm-debug.log*
+frontend-public/yarn-debug.log*
+frontend-public/yarn-error.log*
+frontend-public/pnpm-debug.log*
+frontend-public/*.local
 
 # Temporary project caches
 .cache/

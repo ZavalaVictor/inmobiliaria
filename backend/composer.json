@@ -40,7 +40,7 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate"
         ],
-        "dev": "@php artisan serve",
+        "dev": "cd public && php -d upload_max_filesize=10M -d post_max_size=12M -S 127.0.0.1:8000 -t . ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php",
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"

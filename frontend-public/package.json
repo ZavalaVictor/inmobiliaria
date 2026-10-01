@@ -1,0 +1,19 @@
+{
+  "name": "frontend-public",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "../frontend/node_modules/.bin/vite --config vite.config.ts",
+    "build": "../frontend/node_modules/.bin/tsc -p tsconfig.json --noEmit && ../frontend/node_modules/.bin/vite build --config vite.config.ts",
+    "lint": "../frontend/node_modules/.bin/oxlint src vite.config.ts",
+    "typecheck": "../frontend/node_modules/.bin/tsc -p tsconfig.json --noEmit",
+    "preview": "../frontend/node_modules/.bin/vite preview --config vite.config.ts --host 127.0.0.1 --port 4174"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.22"
+  }
+}

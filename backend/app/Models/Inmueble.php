@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Inmueble extends Model
@@ -82,6 +83,13 @@ class Inmueble extends Model
     public function imagenes(): HasMany
     {
         return $this->hasMany(InmuebleImagen::class, 'inmueble_id');
+    }
+
+    public function imagenPrincipal(): HasOne
+    {
+        return $this->hasOne(InmuebleImagen::class, 'inmueble_id')
+            ->where('es_principal', true)
+            ->orderBy('orden');
     }
 
     protected function childRouteBindingRelationshipName($childType): string

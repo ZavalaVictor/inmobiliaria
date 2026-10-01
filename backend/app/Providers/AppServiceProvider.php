@@ -15,6 +15,7 @@ use App\Services\FirebaseDocumentoPrivateStorage;
 use App\Services\FirebaseInmuebleImageStorage;
 use App\Services\JsonRestoreOperationJournal;
 use App\Services\LocalBackupPrivateStorage;
+use App\Services\LocalInmuebleImageStorage;
 use App\Services\MariaDbBackupService;
 use App\Services\MariaDbRestoreService;
 use App\Services\SymfonyBackupProcessRunner;
@@ -45,7 +46,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(InmuebleImageStorage::class, function (): InmuebleImageStorage {
-            return app(FirebaseInmuebleImageStorage::class);
+            return (string) config('services.firebase.images_bucket') !== ''
+                ? app(FirebaseInmuebleImageStorage::class)
+                : app(LocalInmuebleImageStorage::class);
         });
     }
 

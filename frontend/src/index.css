@@ -62,6 +62,41 @@ input {
   box-shadow: 0 12px 35px rgb(15 58 87 / 6%);
 }
 
+.admin-location-map {
+  min-height: 22rem;
+  overflow: hidden;
+  border: 1px solid var(--app-border);
+  border-radius: .85rem;
+  background: var(--app-surface-muted);
+}
+
+.admin-location-map .leaflet-container {
+  min-height: 22rem;
+  height: 100%;
+  width: 100%;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.admin-location-map .leaflet-control-attribution {
+  font-size: .65rem;
+}
+
+.admin-map-marker {
+  border: 0;
+  background: transparent;
+}
+
+.admin-map-marker span {
+  display: block;
+  width: 1.65rem;
+  height: 1.65rem;
+  transform: rotate(45deg);
+  border: .2rem solid #fff;
+  border-radius: 55% 55% 55% 0;
+  background: var(--app-accent);
+  box-shadow: 0 4px 12px rgb(8 35 50 / 35%);
+}
+
 .app-sidebar {
   background: linear-gradient(180deg, #10243b 0%, #0b1c2f 100%);
   border-color: rgb(255 255 255 / 8%);
@@ -260,6 +295,27 @@ input {
   padding: 0.5rem 2rem 0.5rem 0.75rem;
   color: var(--app-text);
   font-weight: 600;
+}
+
+.app-input {
+  min-height: 2.75rem;
+  width: 100%;
+  border: 1px solid var(--app-border);
+  border-radius: 0.75rem;
+  background: var(--app-surface);
+  padding: 0.5rem 0.75rem;
+  color: var(--app-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.app-input::placeholder {
+  color: var(--app-text-muted);
+  opacity: 0.8;
+}
+
+.app-input:focus {
+  border-color: var(--app-accent);
 }
 
 .app-drawer-backdrop {

@@ -81,7 +81,12 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     await ensureCsrfCookie()
   }
 
-  const body = options.body === undefined ? undefined : JSON.stringify(options.body)
+  const isFormData = options.body instanceof FormData
+  const body: BodyInit | undefined = options.body === undefined
+    ? undefined
+    : options.body instanceof FormData
+      ? options.body
+      : JSON.stringify(options.body)
   const xsrfToken = getCookie('XSRF-TOKEN')
   const response = await fetch(`${apiUrl}${path}`, {
     ...options,
@@ -89,7 +94,7 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     credentials: 'include',
     headers: {
       Accept: 'application/json',
-      ...(body ? { 'Content-Type': 'application/json' } : {}),
+      ...(body && !isFormData ? { 'Content-Type': 'application/json' } : {}),
       ...(xsrfToken ? { 'X-XSRF-TOKEN': xsrfToken } : {}),
       ...options.headers,
     },
