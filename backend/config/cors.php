@@ -19,7 +19,12 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:5173')],
+    // Keep local development working and explicitly allow the deployed public catalog.
+    // FRONTEND_URL can still override/add the canonical frontend origin in Railway.
+    'allowed_origins' => array_values(array_filter([
+        env('FRONTEND_URL', 'http://localhost:5173'),
+        'https://frontend-public-ruby-six.vercel.app',
+    ])),
 
     'allowed_origins_patterns' => [],
 
